@@ -1,0 +1,70 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Group production dependencies (patch/minor)",
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "production-dependencies",
+      "groupSlug": "prod-deps"
+    },
+    {
+      "description": "Group dev dependencies (patch/minor)",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "dev-dependencies",
+      "groupSlug": "dev-deps"
+    },
+    {
+      "description": "Require manual review for major updates",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true,
+      "prCreation": "not-pending"
+    },
+    {
+      "description": "Auto-merge patch updates (optional - enable if desired)",
+      "matchUpdateTypes": ["patch"],
+      "automerge": false,
+      "automergeType": "pr",
+      "platformAutomerge": false
+    },
+    {
+      "description": "Security updates - create immediately",
+      "matchUpdateTypes": ["patch"],
+      "matchSecurityUpdates": true,
+      "groupName": null,
+      "schedule": null,
+      "prPriority": 10
+    },
+    {
+      "description": "Ignore Prisma major updates (require manual migration)",
+      "matchPackageNames": ["@prisma/client", "prisma"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ],
+  "schedule": [
+    "before 10am on monday"
+  ],
+  "timezone": "UTC",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "commitMessagePrefix": "chore:",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "pnpm": {
+    "enabled": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 10am on monday"]
+  }
+}

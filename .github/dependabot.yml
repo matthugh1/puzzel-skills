@@ -1,0 +1,76 @@
+# Dependabot Configuration
+# Dependabot is FREE for all GitHub repositories (public and private)
+# 
+# This configuration will:
+# - Check for updates weekly
+# - Create pull requests for security updates immediately
+# - Group related updates together
+# - Auto-merge minor/patch updates (optional)
+
+version: 2
+updates:
+  # Enable version updates for npm (pnpm uses npm registry)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Open pull requests for version updates
+    open-pull-requests-limit: 10
+    # Group updates together (reduces PR noise)
+    groups:
+      # Group all patch and minor updates together
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "patch"
+          - "minor"
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "patch"
+          - "minor"
+    # Labels to apply to PRs
+    labels:
+      - "dependencies"
+      - "automated"
+    # Commit message
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    # Ignore major version updates (review manually)
+    ignore:
+      # Prisma major updates require migration
+      - dependency-name: "@prisma/client"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "prisma"
+        update-types: ["version-update:semver-major"]
+      # React major updates require careful review
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      # Next.js major updates require migration
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+    # Security updates are always created immediately
+    # (no need to configure separately)
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "github-actions"
+      - "automated"
+
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "docker"
+      - "automated"
