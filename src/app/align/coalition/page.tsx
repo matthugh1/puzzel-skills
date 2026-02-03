@@ -1,16 +1,17 @@
 import Link from 'next/link';
 import { db } from '@/lib/db';
-import { AlignRoadmap } from '@/components/align/AlignRoadmap';
+import { AlignCoalition } from '@/components/align/AlignCoalition';
 
-export default async function AlignRoadmapPage() {
+export default async function AlignCoalitionPage() {
   const latestSnapshot = await db.alignmentSnapshot.findFirst({
     orderBy: { updatedAt: 'desc' },
   });
 
-  const roadmapItems = latestSnapshot
-    ? await db.roadmapItem.findMany({
+  const coalitionMembers = latestSnapshot
+    ? await db.coalitionMember.findMany({
         where: { snapshotId: latestSnapshot.id },
-        orderBy: { priority: 'asc' },
+        orderBy: { createdAt: 'asc' },
+        include: { user: { select: { id: true, name: true, email: true } } },
       })
     : [];
 
@@ -32,19 +33,19 @@ export default async function AlignRoadmapPage() {
               fontFamily: 'var(--font-display)',
               color: 'var(--color-text)',
             }}>
-              Align: Roadmap
+              Align: Coalition
             </h1>
             <p style={{
               margin: 'var(--spacing-xs) 0 0 0',
               color: 'var(--color-text-secondary)',
               fontSize: '0.95rem',
             }}>
-              Step 3 of Align. Prioritize near-term delivery.
+              Step 4 of Align. Assign sponsor, lead, and champions.
             </p>
           </div>
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
             <Link
-              href="/align/opportunities"
+              href="/align/roadmap"
               style={{
                 padding: 'var(--spacing-sm) var(--spacing-md)',
                 background: 'var(--color-surface-secondary)',
@@ -56,22 +57,7 @@ export default async function AlignRoadmapPage() {
                 fontSize: '0.9rem',
               }}
             >
-              Back to Opportunities
-            </Link>
-            <Link
-              href="/align/coalition"
-              style={{
-                padding: 'var(--spacing-sm) var(--spacing-md)',
-                background: 'var(--color-surface-secondary)',
-                color: 'var(--color-text)',
-                borderRadius: 'var(--radius-md)',
-                textDecoration: 'none',
-                border: '1px solid var(--color-border)',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-              }}
-            >
-              Continue to Coalition
+              Back to Roadmap
             </Link>
             <Link
               href="/align"
@@ -105,7 +91,7 @@ export default async function AlignRoadmapPage() {
             </div>
           </section>
         ) : (
-          <AlignRoadmap snapshotId={latestSnapshot.id} roadmapItems={roadmapItems} />
+          <AlignCoalition snapshotId={latestSnapshot.id} coalitionMembers={coalitionMembers} />
         )}
       </main>
     </div>

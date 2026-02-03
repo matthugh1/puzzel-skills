@@ -44,6 +44,12 @@ const userNavItems: NavItem[] = [
     requiresPermission: 'align:read',
   },
   {
+    href: '/align/coalition',
+    label: 'Align Coalition',
+    requiresAuth: true,
+    requiresPermission: 'align:read',
+  },
+  {
     href: '/align/wizard',
     label: 'Align Wizard',
     requiresAuth: true,
