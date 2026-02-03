@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Skills Library
 
-## Getting Started
+A platform for creating, versioning, approving, and sharing AI prompts (skills) across Puzzel.
 
-First, run the development server:
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# 1. Install dependencies
+pnpm install
+
+# 2. Start the database
+pnpm db:up
+
+# 3. Generate Prisma client
+pnpm db:generate
+
+# 4. Push schema to database
+pnpm db:push
+
+# 5. Start development server
 pnpm dev
-# or
-bun dev
+
+# 6. Verify health check
+curl http://localhost:3000/api/health
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Run ESLint |
+| `pnpm format` | Format code with Prettier |
+| `pnpm db:up` | Start PostgreSQL (Docker) |
+| `pnpm db:down` | Stop PostgreSQL |
+| `pnpm db:generate` | Generate Prisma client |
+| `pnpm db:push` | Push schema to database (dev only) |
+| `pnpm db:seed` | Seed database with initial data |
+| `pnpm db:studio` | Open Prisma Studio |
+| `pnpm check:migration-safety` | Check migrations for dangerous operations |
+| `pnpm pre-deploy:check` | Run all pre-deployment checks |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### ⚠️ Database Migration Safety
 
-## Learn More
+**NEVER use these commands in production:**
+- `pnpm db:reset` - **DROPS ALL DATA** (development only)
+- `prisma db push --force-reset` - **DROPS ALL TABLES**
 
-To learn more about Next.js, take a look at the following resources:
+**Always use for production:**
+- `npx prisma migrate deploy` - Safely applies pending migrations
+- `pnpm check:migration-safety` - Validates migrations before deployment
+- `pnpm pre-deploy:check` - Includes migration safety check
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+See [Migration Safety Guide](./docs/migration-safety.md) for detailed best practices.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```
+skills-library/
+├── prisma/
+│   └── schema.prisma      # Database schema
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── health/    # Health check endpoint
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── lib/
+│   │   ├── db.ts          # Prisma client
+│   │   └── env.ts         # Environment validation
+│   ├── providers/
+│   │   └── index.tsx      # React providers
+│   └── types/
+│       └── index.ts       # Shared types
+├── docker-compose.yml     # Local database
+├── .env.example           # Environment template
+└── .env.local             # Local environment (gitignored)
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Environment Variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Copy `.env.example` to `.env.local` and configure:
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Auth session secret |
+| `NEXTAUTH_URL` | Application URL |
+
+## Build Jobs
+
+This project is being built following the job specifications in:
+`/Claude CoWork/skills-library-build/`
+
+Current status: JOB-01 (Project Scaffolding) - In Progress
+
+## Documentation
+
+- [Project Reference](../Claude%20CoWork/skills-library-build/PROJECT_REFERENCE.md)
+- [Job Specifications](../Claude%20CoWork/skills-library-build/jobs/)

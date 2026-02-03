@@ -1,0 +1,916 @@
+// Prisma Schema for Skills Library
+// Full RBAC model with skills, versions, and audit logging
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// AUTH & RBAC
+// ============================================================================
+
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  name         String?
+  authProvider AuthProvider @default(LOCAL)
+  externalId   String? // Azure AD object ID (for future SSO)
+  passwordHash String? // Only for local auth
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  // Relations
+  roles               UserRole[]
+  ownedSkills         Skill[]            @relation("SkillOwner")
+  createdVersions     SkillVersion[]     @relation("VersionCreator")
+  approvedVersions    SkillVersion[]     @relation("VersionApprover")
+  auditLogs           AuditLog[]
+  initiatedRuns       AgentRun[]         @relation("RunInitiator")
+  initiatedBatches    BatchRun[]         @relation("BatchInitiator")
+  createdPolicies     RunPolicy[]        @relation("PolicyCreator")
+  requestedApprovals  RunApproval[]      @relation("ApprovalRequester")
+  approvedRuns        RunApproval[]      @relation("ApprovalApprover")
+  assignedTasks       RunTask[]          @relation("TaskAssignee")
+  requestedDataInputs DataInputRequest[] @relation("DataInputRequester")
+  assignedDataInputs  DataInputRequest[] @relation("DataInputAssignee")
+  selectedPaths       RunPath[]          @relation("PathSelector")
+  ownedWorkflows      Workflow[]         @relation("WorkflowOwner")
+  sharedWorkflows     WorkflowShare[]    @relation("WorkflowSharee")
+  sharedWorkflowsBy   WorkflowShare[]    @relation("WorkflowSharer")
+  ownedFolders        Folder[]           @relation("FolderOwner")
+  integrations        AppIntegration[]
+  ownedAgents         Agent[]            @relation("AgentOwner")
+  alignmentSnapshots  AlignmentSnapshot[] @relation("AlignmentOwner")
+  ownedOpportunities  Opportunity[]       @relation("OpportunityOwner")
+  ownedRoadmapItems   RoadmapItem[]        @relation("RoadmapOwner")
+  coalitionMemberships CoalitionMember[]  @relation("CoalitionMemberUser")
+  createdGuardrails   GuardrailPolicy[]   @relation("GuardrailCreator")
+
+  @@map("users")
+}
+
+enum AuthProvider {
+  LOCAL
+  AZURE
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique // admin, approver, creator, viewer
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users       UserRole[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique // skills:read, skills:create, etc.
+  description String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model UserRole {
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// ============================================================================
+// SKILLS
+// ============================================================================
+
+model Skill {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  category    String?
+  tags        String[]    @default([])
+  status      SkillStatus @default(DRAFT)
+  visibility  Visibility  @default(ORG)
+
+  ownerId String
+  owner   User   @relation("SkillOwner", fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  versions SkillVersion[]
+
+  @@index([ownerId])
+  @@index([category])
+  @@index([status])
+  @@map("skills")
+}
+
+enum SkillStatus {
+  DRAFT
+  PENDING_APPROVAL
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Visibility {
+  TEAM
+  ORG
+}
+
+enum WorkflowStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum TriggerType {
+  MANUAL
+  WEBHOOK
+  SCHEDULED
+  APP_EVENT
+}
+
+enum TriggerStatus {
+  ACTIVE
+  PAUSED
+  ERROR
+}
+
+model SkillVersion {
+  id          String        @id @default(cuid())
+  version     Int // 1, 2, 3...
+  content     String // The actual prompt text
+  changeNotes String?
+  status      VersionStatus @default(DRAFT)
+
+  skillId String
+  skill   Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  createdById String
+  createdBy   User   @relation("VersionCreator", fields: [createdById], references: [id])
+
+  approvedById String?
+  approvedBy   User?     @relation("VersionApprover", fields: [approvedById], references: [id])
+  approvedAt   DateTime?
+
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  metadata SkillVersionMetadata?
+  steps    RunStep[]
+
+  @@unique([skillId, version])
+  @@index([skillId])
+  @@index([status])
+  @@map("skill_versions")
+}
+
+enum VersionStatus {
+  DRAFT
+  PENDING_APPROVAL
+  PUBLISHED
+  REJECTED
+}
+
+// ============================================================================
+// ALIGN
+// ============================================================================
+
+enum AlignmentStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum OpportunityStatus {
+  IDEA
+  PRIORITIZED
+  DEFERRED
+}
+
+enum RoadmapStatus {
+  PLANNED
+  IN_PROGRESS
+  DONE
+}
+
+enum CoalitionRole {
+  SPONSOR
+  LEAD
+  CHAMPION
+  IT
+  SECURITY
+  LND
+}
+
+model AlignmentSnapshot {
+  id      String           @id @default(cuid())
+  title   String
+  summary String?
+  status  AlignmentStatus  @default(DRAFT)
+
+  ownerId String
+  owner   User   @relation("AlignmentOwner", fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  opportunities    Opportunity[]
+  roadmapItems     RoadmapItem[]
+  coalitionMembers CoalitionMember[]
+  guardrailPolicies GuardrailPolicy[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@map("alignment_snapshots")
+}
+
+model Opportunity {
+  id              String            @id @default(cuid())
+  snapshotId      String
+  snapshot        AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?
+  department      String?
+  valueScore      Int
+  feasibilityScore Int
+  timeToPilotWeeks Int?
+  status          OpportunityStatus @default(IDEA)
+
+  ownerId String
+  owner   User   @relation("OpportunityOwner", fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roadmapItems RoadmapItem[]
+
+  @@index([snapshotId])
+  @@index([status])
+  @@index([department])
+  @@index([ownerId])
+  @@map("alignment_opportunities")
+}
+
+model RoadmapItem {
+  id           String            @id @default(cuid())
+  snapshotId   String
+  snapshot     AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  opportunityId String?
+  opportunity  Opportunity?     @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  title        String
+  priority     Int
+  targetQuarter String?
+  status       RoadmapStatus     @default(PLANNED)
+
+  ownerId String
+  owner   User   @relation("RoadmapOwner", fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([snapshotId])
+  @@index([status])
+  @@index([priority])
+  @@index([ownerId])
+  @@map("alignment_roadmap_items")
+}
+
+model CoalitionMember {
+  id         String            @id @default(cuid())
+  snapshotId String
+  snapshot   AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User              @relation("CoalitionMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+  role       CoalitionRole
+  notes      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([snapshotId, userId, role])
+  @@index([snapshotId])
+  @@index([role])
+  @@index([userId])
+  @@map("alignment_coalition_members")
+}
+
+model GuardrailPolicy {
+  id               String            @id @default(cuid())
+  snapshotId       String
+  snapshot         AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  createdById      String
+  createdBy        User              @relation("GuardrailCreator", fields: [createdById], references: [id])
+  allowedCategories String[]
+  blockedCategories String[]
+  requiresApproval Boolean           @default(false)
+  notes            String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([snapshotId])
+  @@index([createdById])
+  @@map("alignment_guardrails")
+}
+
+// ============================================================================
+// AGENTIC EXECUTION
+// ============================================================================
+
+enum RunStatus {
+  PLANNING
+  RUNNING
+  BLOCKED
+  COMPLETE
+  FAILED
+  CANCELLED
+}
+
+enum StepStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+  FAILED_STALE
+  SKIPPED
+}
+
+enum ArtefactType {
+  PROMPT_OUTPUT
+  FILE_DIFF
+  CODE_CHANGE
+  DECISION_LOG
+  ERROR
+  EXECUTOR_OUTPUT
+  TOOL_REQUEST
+}
+
+enum Sensitivity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model RunPolicy {
+  id                      String   @id @default(cuid())
+  name                    String   @unique
+  description             String?
+  maxSteps                Int
+  maxRetriesPerStep       Int      @default(3)
+  maxDurationSeconds      Int
+  requiresApproval        Boolean  @default(false)
+  allowedCategories       String[]
+  blockedCategories       String[]
+  allowedCapabilities     String[]
+  blockedCapabilities     String[]
+  allowedTags             String[]
+  blockedTags             String[]
+  maxDiffBudget           Int?
+  maxArtefactsPerRun      Int      @default(100)
+  maxInitialContextBytes  Int      @default(100000)
+  environmentRestrictions Json?
+  governanceRules         Json?
+
+  createdById String
+  createdBy   User     @relation("PolicyCreator", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  runs            AgentRun[]
+  WebhookEndpoint WebhookEndpoint[]
+
+  @@map("run_policies")
+}
+
+enum BatchStatus {
+  PENDING
+  RUNNING
+  COMPLETE
+  FAILED
+  CANCELLED
+}
+
+model BatchRun {
+  id                 String      @id @default(cuid())
+  workflowId         String
+  workflow           Workflow    @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  userId             String
+  user               User        @relation("BatchInitiator", fields: [userId], references: [id])
+  status             BatchStatus @default(PENDING)
+  totalItems         Int
+  completedItems     Int         @default(0)
+  failedItems        Int         @default(0)
+  concurrency        Int         @default(5) // Max parallel executions
+  startedAt          DateTime?
+  completedAt        DateTime?
+  failedAt           DateTime?
+  cancelledAt        DateTime?
+  cancellationReason String?
+  metadata           Json?
+
+  runs AgentRun[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([workflowId])
+  @@index([userId])
+  @@index([status])
+  @@map("batch_runs")
+}
+
+model AgentRun {
+  id                     String     @id @default(cuid())
+  userId                 String
+  user                   User       @relation("RunInitiator", fields: [userId], references: [id])
+  agentId                String?
+  agent                  Agent?     @relation(fields: [agentId], references: [id])
+  workflowId             String? // Nullable - runs can be ad-hoc or from workflow
+  workflow               Workflow?  @relation(fields: [workflowId], references: [id])
+  batchId                String? // Nullable - runs can be standalone or part of batch
+  batch                  BatchRun?  @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  batchIndex             Int? // Index within batch (0-based)
+  status                 RunStatus  @default(PLANNING)
+  goal                   String
+  initialContext         Json
+  initialContextRedacted Boolean    @default(false)
+  inputAllowlist         Json? // String[] | null (null = default, [] = allow nothing, populated = explicit)
+  policyId               String?
+  policy                 RunPolicy? @relation(fields: [policyId], references: [id])
+  plan                   Json?
+  planContentHash        String?
+  currentStepIndex       Int        @default(0)
+  blockedReason          String?
+  idempotencyKey         String?    @unique
+  leaseOwner             String?
+  leaseExpiresAt         DateTime?
+  maxDurationSeconds     Int?
+  startedAt              DateTime?
+  completedAt            DateTime?
+  failedAt               DateTime?
+  cancelledAt            DateTime?
+  cancellationReason     String?
+  metadata               Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  steps          RunStep[]
+  artefacts      RunArtefact[]
+  approvals      RunApproval[]
+  tasks          RunTask[]
+  dataInputs     DataInputRequest[]
+  pathSelections RunPath[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([workflowId])
+  @@index([batchId])
+  @@index([idempotencyKey])
+  @@index([leaseOwner])
+  @@map("agent_runs")
+}
+
+model RunStep {
+  id                      String       @id @default(cuid())
+  runId                   String
+  run                     AgentRun     @relation(fields: [runId], references: [id], onDelete: Cascade)
+  stepIndex               Int
+  skillId                 String
+  skillVersionId          String
+  skillVersion            SkillVersion @relation(fields: [skillVersionId], references: [id])
+  skillVersionContentHash String
+  status                  StepStatus   @default(PENDING)
+  inputContext            Json
+  outputContext           Json?
+  errorMessage            String?
+  retryCount              Int          @default(0)
+  idempotencyKey          String?
+  startedAt               DateTime?
+  completedAt             DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artefacts RunArtefact[]
+
+  @@unique([runId, stepIndex])
+  @@index([runId])
+  @@index([skillVersionId])
+  @@map("run_steps")
+}
+
+model RunArtefact {
+  id                 String       @id @default(cuid())
+  stepId             String
+  step               RunStep      @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  runId              String
+  run                AgentRun     @relation(fields: [runId], references: [id], onDelete: Cascade)
+  type               ArtefactType
+  content            Json
+  contentRedacted    Boolean      @default(false)
+  sensitivity        Sensitivity
+  retentionExpiresAt DateTime?
+  metadata           Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([runId])
+  @@index([stepId])
+  @@index([type])
+  @@index([sensitivity])
+  @@map("run_artefacts")
+}
+
+model RunApproval {
+  id              String    @id @default(cuid())
+  runId           String
+  run             AgentRun  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  requestedAt     DateTime  @default(now())
+  requestedBy     String
+  requestedByUser User      @relation("ApprovalRequester", fields: [requestedBy], references: [id])
+  approvedAt      DateTime?
+  approvedBy      String?
+  approvedByUser  User?     @relation("ApprovalApprover", fields: [approvedBy], references: [id])
+  rejectedAt      DateTime?
+  reason          String?
+  rejectionReason String?
+
+  @@index([runId])
+  @@map("run_approvals")
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  TIMEOUT
+}
+
+model RunTask {
+  id          String     @id @default(cuid())
+  runId       String
+  run         AgentRun   @relation(fields: [runId], references: [id], onDelete: Cascade)
+  stepIndex   Int
+  title       String
+  description String?
+  assigneeId  String
+  assignee    User       @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  status      TaskStatus @default(PENDING)
+  result      Json? // Task completion result
+  completedAt DateTime?
+  cancelledAt DateTime?
+  timeoutAt   DateTime?
+  metadata    Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([runId, stepIndex])
+  @@index([runId])
+  @@index([assigneeId])
+  @@index([status])
+  @@map("run_tasks")
+}
+
+enum DataInputStatus {
+  PENDING
+  SUBMITTED
+  CANCELLED
+  TIMEOUT
+}
+
+model DataInputRequest {
+  id              String          @id @default(cuid())
+  runId           String
+  run             AgentRun        @relation(fields: [runId], references: [id], onDelete: Cascade)
+  stepIndex       Int
+  inputSchema     Json // JSON Schema for form fields
+  requestedBy     String
+  requestedByUser User            @relation("DataInputRequester", fields: [requestedBy], references: [id])
+  assigneeId      String? // Optional - if null, assigned to run initiator
+  assignee        User?           @relation("DataInputAssignee", fields: [assigneeId], references: [id])
+  status          DataInputStatus @default(PENDING)
+  submittedData   Json? // Submitted form data
+  submittedAt     DateTime?
+  cancelledAt     DateTime?
+  timeoutAt       DateTime?
+  metadata        Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([runId, stepIndex])
+  @@index([runId])
+  @@index([assigneeId])
+  @@index([status])
+  @@map("data_input_requests")
+}
+
+enum PathSelectionStatus {
+  PENDING
+  SELECTED
+  CANCELLED
+  TIMEOUT
+}
+
+model RunPath {
+  id             String              @id @default(cuid())
+  runId          String
+  run            AgentRun            @relation(fields: [runId], references: [id], onDelete: Cascade)
+  stepIndex      Int
+  branchStepId   String // ID of the branch step
+  pathOptions    Json // Array of path options with labels
+  status         PathSelectionStatus @default(PENDING)
+  selectedPath   String? // Selected path identifier
+  selectedBy     String?
+  selectedByUser User?               @relation("PathSelector", fields: [selectedBy], references: [id])
+  selectedAt     DateTime?
+  cancelledAt    DateTime?
+  timeoutAt      DateTime?
+  metadata       Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([runId, stepIndex])
+  @@index([runId])
+  @@index([status])
+  @@map("run_paths")
+}
+
+model SkillVersionMetadata {
+  id               String       @id @default(cuid())
+  skillVersionId   String       @unique
+  skillVersion     SkillVersion @relation(fields: [skillVersionId], references: [id], onDelete: Cascade)
+  outputContract   Json?
+  capabilities     String[]
+  preferredInputs  Json? // String[] | null
+  maxRetries       Int?
+  timeoutSeconds   Int?
+  requiresApproval Boolean      @default(false)
+  executorConfig   Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("skill_version_metadata")
+}
+
+// ============================================================================
+// WORKFLOWS
+// ============================================================================
+
+model Workflow {
+  id          String         @id @default(cuid())
+  name        String
+  description String?
+  category    String?
+  tags        String[]       @default([])
+  plan        Json // Workflow step definition (LangGraph-compatible)
+  status      WorkflowStatus @default(DRAFT)
+  visibility  Visibility     @default(ORG)
+  
+  // LLM Configuration
+  llmProvider String?  // 'openai' | 'anthropic' | null (defaults to openai)
+  llmModel    String?  // Model name (e.g., 'gpt-4o-mini', 'claude-3-7-sonnet-latest')
+
+  ownerId    String
+  owner      User      @relation("WorkflowOwner", fields: [ownerId], references: [id])
+  folderId   String?
+  folder     Folder?   @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  archivedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  runs            AgentRun[]
+  batches         BatchRun[]
+  triggers        WorkflowTrigger[]
+  WebhookEndpoint WebhookEndpoint[]
+  shares          WorkflowShare[]
+  agents          Agent[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([category])
+  @@index([visibility])
+  @@index([folderId])
+  @@index([archivedAt])
+  @@map("workflows")
+}
+
+// ============================================================================
+// AGENTS
+// ============================================================================
+
+model Agent {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  goal        String
+  status      AgentStatus @default(READY)
+  config      Json?    // LLM config, capabilities
+  
+  ownerId     String
+  owner       User     @relation("AgentOwner", fields: [ownerId], references: [id])
+  
+  workflowId  String?
+  workflow    Workflow? @relation(fields: [workflowId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  runs        AgentRun[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@map("agents")
+}
+
+enum AgentStatus {
+  READY
+  RUNNING
+  DISABLED
+}
+
+model Folder {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  parentId    String?
+  parent      Folder?    @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Folder[]   @relation("FolderHierarchy")
+  ownerId     String
+  owner       User       @relation("FolderOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  workflows   Workflow[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([ownerId])
+  @@index([parentId])
+  @@map("folders")
+}
+
+enum SharePermission {
+  VIEWER
+  EDITOR
+}
+
+model WorkflowShare {
+  id           String          @id @default(cuid())
+  workflowId   String
+  workflow     Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User            @relation("WorkflowSharee", fields: [userId], references: [id], onDelete: Cascade)
+  permission   SharePermission @default(VIEWER)
+  sharedBy     String
+  sharedByUser User            @relation("WorkflowSharer", fields: [sharedBy], references: [id])
+  sharedAt     DateTime        @default(now())
+
+  @@unique([workflowId, userId])
+  @@index([workflowId])
+  @@index([userId])
+  @@map("workflow_shares")
+}
+
+model WorkflowTrigger {
+  id              String        @id @default(cuid())
+  workflowId      String
+  workflow        Workflow      @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  triggerType     TriggerType
+  config          Json // Trigger-specific configuration
+  status          TriggerStatus @default(ACTIVE)
+  lastTriggeredAt DateTime?
+  errorMessage    String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([workflowId])
+  @@index([status])
+  @@index([triggerType])
+  @@map("workflow_triggers")
+}
+
+model WebhookEndpoint {
+  id          String     @id @default(cuid())
+  workflowId  String
+  workflow    Workflow   @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  path        String     @unique // Unique webhook path (e.g., "wh_abc123...")
+  secret      String? // Optional secret for webhook signature verification
+  headers     Json? // Expected headers for validation
+  createdAt   DateTime   @default(now())
+  RunPolicy   RunPolicy? @relation(fields: [runPolicyId], references: [id])
+  runPolicyId String?
+
+  @@index([workflowId])
+  @@index([path])
+  @@map("webhook_endpoints")
+}
+
+// ============================================================================
+// APP INTEGRATIONS
+// ============================================================================
+
+enum IntegrationStatus {
+  CONNECTING
+  CONNECTED
+  DISCONNECTED
+  ERROR
+}
+
+model AppIntegration {
+  id           String            @id @default(cuid())
+  appName      String // e.g., "gmail", "slack"
+  userId       String
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentials  Json // Encrypted OAuth tokens or API keys
+  status       IntegrationStatus @default(CONNECTING)
+  lastSyncAt   DateTime?
+  errorMessage String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@unique([userId, appName])
+  @@index([userId])
+  @@index([appName])
+  @@index([status])
+  @@map("app_integrations")
+}
+
+model AppAction {
+  id           String   @id @default(cuid())
+  appName      String
+  actionName   String // e.g., "send_email", "read_emails"
+  description  String?
+  inputSchema  Json // JSON Schema for action inputs
+  outputSchema Json // JSON Schema for action outputs
+  requiresAuth Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([appName, actionName])
+  @@index([appName])
+  @@map("app_actions")
+}
+
+// ============================================================================
+// AUDIT
+// ============================================================================
+
+model AuditLog {
+  id           String  @id @default(cuid())
+  action       String // e.g., "skill.created", "version.approved"
+  resourceType String // e.g., "skill", "user"
+  resourceId   String
+  details      Json? // Additional context
+  ipAddress    String?
+  userAgent    String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

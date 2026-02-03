@@ -1,0 +1,6 @@
+{
+  "/api/export/route": "app/api/export/route.js",
+  "/page": "app/page.js",
+  "/documents/[id]/page": "app/documents/[id]/page.js",
+  "/documents/page": "app/documents/page.js"
+}

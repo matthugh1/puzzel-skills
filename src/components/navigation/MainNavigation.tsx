@@ -1,0 +1,303 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+interface NavItem {
+  href: string;
+  label: string;
+  requiresAuth?: boolean;
+  requiresRole?: string[];
+  requiresPermission?: string;
+}
+
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  roles: string[];
+  permissions: string[];
+}
+
+const userNavItems: NavItem[] = [
+  { href: '/skills', label: 'Skills Browser' },
+  { href: '/tools', label: 'Tools', requiresAuth: true },
+  { href: '/my-skills', label: 'My Skills', requiresAuth: true },
+  { href: '/plan', label: 'Plan', requiresAuth: true },
+  {
+    href: '/align',
+    label: 'Align',
+    requiresAuth: true,
+    requiresPermission: 'align:read',
+  },
+  { href: '/workflows', label: 'Workflows', requiresAuth: true },
+  { href: '/agents', label: 'Agents', requiresAuth: true },
+  { href: '/integrations', label: 'Integrations', requiresAuth: true },
+  { href: '/inbox', label: 'Inbox', requiresAuth: true },
+  { href: '/runs', label: 'My Agents', requiresAuth: true },
+  {
+    href: '/approvals',
+    label: 'Skill Approvals',
+    requiresAuth: true,
+    requiresRole: ['approver', 'admin'],
+  },
+  {
+    href: '/runs/approvals',
+    label: 'Task Approvals',
+    requiresAuth: true,
+    requiresPermission: 'runs:approve',
+  },
+];
+
+const systemNavItems: NavItem[] = [
+  { href: '/admin', label: 'Admin Dashboard', requiresAuth: true, requiresRole: ['admin'] },
+];
+
+export function MainNavigation() {
+  const pathname = usePathname();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch user info - cookie will be sent automatically
+    // No need to check localStorage since we use httpOnly cookies
+    fetch('/api/auth/me', {
+      credentials: 'include', // Ensure cookies are sent
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+        return null;
+      })
+      .then((data) => {
+        if (data?.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(() => {
+        // Silently fail - user not authenticated
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  // Don't show navigation on admin pages (they have their own sidebar) or login page
+  if (pathname.startsWith('/admin') || pathname === '/login') {
+    return null;
+  }
+
+  // Filter nav items based on user permissions
+  const visibleUserNavItems = userNavItems.filter((item) => {
+    if (!item.requiresAuth) return true;
+    if (!user) return false;
+    if (item.requiresRole && !item.requiresRole.some((role) => user.roles.includes(role))) {
+      return false;
+    }
+    if (item.requiresPermission && !user.permissions.includes(item.requiresPermission)) {
+      return false;
+    }
+    return true;
+  });
+
+  const visibleSystemNavItems = systemNavItems.filter((item) => {
+    if (!user) return false;
+    if (item.requiresRole && !item.requiresRole.some((role) => user.roles.includes(role))) {
+      return false;
+    }
+    return true;
+  });
+
+  const renderNavItem = (item: NavItem) => {
+    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+    return (
+      <li key={item.href}>
+        <Link
+          href={item.href}
+          style={{
+            display: 'block',
+            padding: 'var(--spacing-sm) var(--spacing-md)',
+            borderRadius: 'var(--radius-md)',
+            textDecoration: 'none',
+            fontSize: '0.875rem',
+            fontWeight: isActive ? 600 : 400,
+            color: isActive ? 'var(--color-primary)' : 'var(--color-text)',
+            background: isActive ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
+            borderLeft: isActive ? '3px solid var(--color-primary)' : '3px solid transparent',
+            transition: 'all 0.2s ease',
+            fontFamily: 'var(--font-body)',
+          }}
+          onMouseEnter={(e) => {
+            if (!isActive) {
+              e.currentTarget.style.background = 'var(--color-surface-secondary)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isActive) {
+              e.currentTarget.style.background = 'transparent';
+            }
+          }}
+        >
+          {item.label}
+        </Link>
+      </li>
+    );
+  };
+
+  return (
+    <aside
+      style={{
+        width: '240px',
+        background: 'var(--color-surface)',
+        borderRight: '1px solid var(--color-border)',
+        padding: 'var(--spacing-lg)',
+        height: '100%',
+        overflowY: 'auto',
+        flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ flexShrink: 0 }}>
+        <h2
+          style={{
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            marginBottom: 'var(--spacing-xl)',
+            fontFamily: 'var(--font-display)',
+            color: 'var(--color-text)',
+          }}
+        >
+          Skills Library
+        </h2>
+
+        <nav>
+          <ul
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--spacing-xs)',
+            }}
+          >
+            {visibleUserNavItems.map(renderNavItem)}
+          </ul>
+        </nav>
+      </div>
+
+      {visibleSystemNavItems.length > 0 && (
+        <div
+          style={{
+            flexShrink: 0,
+            marginTop: 'var(--spacing-xl)',
+            marginBottom: 'var(--spacing-md)',
+            paddingTop: 'var(--spacing-xl)',
+            borderTop: '1px solid var(--color-border)',
+          }}
+        >
+          <h3
+            style={{
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: 'var(--color-text-secondary)',
+              marginBottom: 'var(--spacing-md)',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            System
+          </h3>
+          <ul
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--spacing-xs)',
+            }}
+          >
+            {visibleSystemNavItems.map(renderNavItem)}
+          </ul>
+        </div>
+      )}
+
+      <div
+        style={{
+          marginTop: 'auto',
+          paddingTop: 'var(--spacing-xl)',
+          borderTop: '1px solid var(--color-border)',
+        }}
+      >
+        {user ? (
+          <div
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            <div style={{ fontWeight: 500, color: 'var(--color-text)', marginBottom: 'var(--spacing-xs)' }}>
+              {user.name || user.email}
+            </div>
+            <div style={{ fontSize: '0.75rem' }}>
+              {user.roles.join(', ')}
+            </div>
+            <button
+              onClick={async () => {
+                try {
+                  await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include', // Ensure cookies are sent
+                  });
+                  window.location.href = '/skills';
+                } catch (err) {
+                  console.error('Logout error:', err);
+                  window.location.href = '/skills';
+                }
+              }}
+              style={{
+                marginTop: 'var(--spacing-md)',
+                width: '100%',
+                padding: 'var(--spacing-xs) var(--spacing-md)',
+                fontSize: '0.75rem',
+                background: 'transparent',
+                color: 'var(--color-text-secondary)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-md)',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            style={{
+              display: 'block',
+              padding: 'var(--spacing-sm) var(--spacing-md)',
+              fontSize: '0.875rem',
+              fontWeight: 500,
+              background: 'var(--color-primary)',
+              color: 'white',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              textDecoration: 'none',
+              textAlign: 'center',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            Sign In
+          </Link>
+        )}
+      </div>
+    </aside>
+  );
+}

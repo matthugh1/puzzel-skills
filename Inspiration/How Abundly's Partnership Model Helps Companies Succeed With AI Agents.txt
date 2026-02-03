@@ -1,0 +1,201 @@
+How Abundly's Partnership Model Helps Companies Succeed With AI
+Agents
+Executive Summary
+Most organizations that invest in AI agents fail to capture their value. Agents get built, deployed, and then sit
+unused. The core reason is the black box problem: someone builds an agent, but the people who should use it
+don't understand how it works. They can't iterate or improve it. It's never good enough on the ﬁrst try, and
+nobody can ﬁx it.
+The only way out of the black box problem is to empower domain experts—the people who work directly with
+speciﬁc workﬂows—to build and work with their own AI agents. This is our philosophy: augmentation over
+automation. If we build your agents for you, we have failed.
+Abundly offers Agent Success as a Service—a partnership model that combines platform, training, and advisory
+to make this empowerment possible. We work with your internal coalition to move through three phases:
+Foundation, Factory, and Fleet. Organizations that complete this journey build human+AI teams that
+outcompete those who wait.
+Generative AI Is Two Shifts, Not One
+When people talk about generative AI, they typically think of one major shift. In reality, there are two distinct
+transformations happening, and most organizations are only addressing the ﬁrst.
+The First Shift: AI as a Helpful Tool
+The ﬁrst shift came with ChatGPT and similar tools. Static software became conversational AI for individuals.
+People can now get instant answers, draft documents, and explore ideas through natural conversation. This is
+valuable, but it's fundamentally still a tool that humans use—you ask, it answers.
+The Second Shift: AI as a Coworker
+The second shift is more profound. AI moves from answering questions to taking autonomous action. These are
+AI agents—digital colleagues that can carry out knowledge work on your behalf. An agent doesn't wait for you
+to ask a question. It monitors your inbox, processes documents, coordinates tasks, and proactively reaches out
+when something needs attention.
+This second shift is where the signiﬁcant value lies. An AI agent can work 24/7, handle scale that humans
+cannot, and free your team to focus on work that requires human judgment and creativity.
+Abundly is fully focused on this second shift—on AI agents. We help organizations build human+AI teams
+where agents and people work side by side as colleagues.
+Why Most Agent Initiatives Fail
+Everyone talks about building and deploying agents. What few acknowledge is that most agents end up sitting
+unused. The pattern is remarkably consistent:
+1. IT purchases an AI agent platform
+2. Someone builds an agent
+3. The people who should use it don't understand how it works
+4. It becomes a black box—nobody can iterate or improve it
+5. The agent is never quite good enough (and agents are rarely perfect on the ﬁrst try)
+6. It sits unused, and the investment is wasted
+This is the black box problem. The knowledge of how the agent works sits with whoever built it—often an
+external vendor or a single technical person. The domain experts who actually need to use and improve the
+agent are locked out.
+And here's the critical insight: agents need continuous iteration. Workﬂows change. Edge cases appear. Users
+have feedback. An agent that can't be improved is an agent that will eventually fail.
+The black box problem is why most agent initiatives fail. The solution isn't better technology or more features.
+The solution is ensuring the right people can build and iterate on their own agents.
+Our Philosophy: Augmentation Over Automation
+At the core of everything we do is a simple but powerful belief: if we build your agents for you, we have
+failed.
+This may sound counterintuitive from a company that helps build agents. But consider the alternative: we build
+an agent, hand it over, and leave. What happens when something breaks? When the workﬂow changes? When
+someone wants to improve how the agent works? You're dependent on external help for every iteration. You're
+stuck in the black box.
+Our philosophy centers on augmentation over automation. We believe in empowering domain experts—the
+people who work directly with speciﬁc workﬂows—to build and continuously work with their own AI agents.
+These are the people who understand the nuances, who will notice when something isn't quite right, and who
+can iterate quickly to make improvements.
+This approach requires more investment upfront than simply outsourcing agent development. But it creates
+sustainable value. Your organization develops the muscle to work with AI agents. You can onboard new agents
+faster. You can adapt as circumstances change. You're not dependent on anyone.
+The organizations that take this path build genuine competitive advantage. Those that take shortcuts end up with
+expensive technology that nobody uses.
+What Agent Success Requires
+Empowering domain experts to build and work with their own agents doesn't happen automatically. It requires
+working across four interconnected dimensions:
+DimensionWhat It Means
+StrategyClarity on what you're trying to accomplish. Which use cases will deliver the most value? What's the
+prioritized roadmap?
+OperationsHands-on work with speciﬁc workﬂows. Where can agents add value? How do you redesign processes for
+human+AI collaboration?
+People Identifying and activating champions. Building capabilities. Bringing the organization along.
+IT/Tech Platform access and tooling. Security and governance as you scale.
+Addressing only one or two of these dimensions guarantees failure. The organizations that succeed work on all
+four together. This is what we mean by Agent Success—not just building agents, but everything needed to
+actually succeed with them.
+The Journey: Foundation, Factory, Fleet
+The path to Agent Success follows three phases. Each builds on the last, and attempting to skip phases leads to
+failure.
+Foundation: Getting the Basics Right
+Foundation is about establishing the core elements you need before you can scale. This is where most
+organizations should start, and many never get beyond this phase because they rush ahead without solid
+foundations.
+What Foundation involves:
+DimensionFoundation Activities
+StrategyOpportunity mapping across your organization. Creating an initial roadmap of potential agent use cases,
+prioritized by value and feasibility.
+OperationsBuilding your ﬁrst production agent. Doing targeted process re-engineering to understand how agents ﬁt
+into real workﬂows.
+People Assembling your coalition—sponsor, lead, and initial champions. Training this core group so they
+understand agents deeply.
+IT/Tech Ensuring your team has access to an appropriate agent platform. Basic setup and conﬁguration.
+What success looks like: Your coalition is trained and energized. You have at least one agent in production,
+delivering real value. You have a clear view of where agents could add value across your organization. You're
+ready to scale.
+Typical timeline: 4-8 weeks
+Factory: Scaling Agent Development
+Once foundations are solid, Factory is where the real value creation begins. This phase is about developing the
+organizational muscle to build many agents. Before you can become sophisticated about governance and
+optimization, you need to learn how to build.
+What Factory involves:
+DimensionFactory Activities
+StrategyMoving from initial roadmap to comprehensive vision. Re-prioritizing based on what you've learned.
+Understanding how agents could transform your value proposition.
+OperationsBuilding and reﬁning a portfolio of agents. Multiple agents in production across different parts of the
+organization.
+People Broad capability building. Champions across the organization learning to build and work with agents. Basic
+AI literacy for everyone.
+IT/Tech Scaling platform access. More users, more use cases, more complexity.
+What success looks like: You have many agents in production, creating value across multiple workﬂows.
+Champions throughout your organization can build agents with minimal support. The organization is becoming
+comfortable working alongside AI colleagues.
+Typical timeline: 3-6 months
+Fleet: Governing and Optimizing
+Fleet is where you transition from building agents to managing a ﬂeet of them. You now have many AI
+coworkers operating across your organization. How do you ensure they're creating value? How do you maintain
+appropriate oversight? How do you continuously improve?
+What Fleet involves:
+DimensionFleet Activities
+StrategyRevisiting your value proposition. Understanding how AI agents change what you can offer customers and
+how you operate. Developing a mature operating model for human+AI teams.
+OperationsEstablishing enabling infrastructure for many agents. Collaboration frameworks. Monitoring and
+optimization at scale.
+People Full change management. Helping the entire organization adapt to working with AI colleagues. Managing
+the cultural shift.
+IT/Tech Governance, guardrails, and controls. Security oversight. Ensuring the ﬂeet operates safely and effectively.
+What success looks like: You have human+AI teams operating throughout your organization. Agents are
+creating signiﬁcant value. You have appropriate governance without stiﬂing innovation. Your organization has
+developed the muscle to continuously onboard new and more powerful agents.
+Typical timeline: Ongoing
+Why Act Now
+AI agents are becoming dramatically more powerful. Long-running agents that handle multi-day tasks are
+becoming viable. Multi-agent collaboration is emerging. The agents available in two years will be far more
+capable than those available today.
+This creates a diverging path:
+Organizations that prepare now move through Foundation, Factory, and Fleet. They develop the muscle to
+work with agents. When more powerful agents become available, they can onboard them quickly.
+Organizations that wait will eventually need to adopt agents—competitive pressure will demand it. But they'll
+be starting from zero while competitors operate at scale.
+The journey to agent-readiness takes time. The organizations that start now will have a sustained advantage.
+Why Partner With Abundly
+Our Philosophy Sets Us Apart
+The ﬁrst reason to work with Abundly is our commitment to augmentation over automation. We don't create
+dependency. We measure success by how capable your organization becomes—not by how much you need us.
+This means we prioritize capability transfer in every engagement. We don't just build agents—we teach your
+champions to build agents. We don't just solve problems—we help your team understand solutions so they can
+handle similar challenges independently.
+We Provide Everything You Need, Integrated
+Many vendors sell platform, training, or consulting separately. Buying from multiple vendors means nobody is
+responsible for the overall outcome.
+We combine platform, training, and advisory into one integrated service. The platform is built by people who
+understand organizational change. The training is delivered by people who build production agents. The
+advisory is informed by what we learn from thousands of users and engagements. Everything reinforces
+everything else.
+We De-risk Your Adoption
+Adopting AI agents is a hard challenge. Many organizations have invested in AI initiatives that didn't deliver.
+Our partnership model is designed to de-risk this adoption. We've seen what works and what doesn't across
+hundreds of engagements.
+We Have Deep Experience
+We have worked with over 200 organizations on adopting generative AI and agents. We have trained thousands
+of professionals. We have built countless production agents. This experience compounds—every engagement
+teaches us something that helps the next customer succeed faster.
+How We Work Together
+Your Coalition
+Successful agent adoption requires internal commitment. We work with your core coalition:
+Role Responsibility
+Sponsor Senior leader who ensures organizational commitment and removes blockers
+Lead Project manager who coordinates activities and ensures things happen
+Champions Individuals who build agents, ﬁnd use cases, and bring colleagues on board
+Learning & DevelopmentEnsures capability building happens systematically
+IT/Tech Ensures agent adoption ﬁts your IT architecture and security requirements
+What Abundly Brings
+Role What We Provide
+Advisor Strategic guidance on prioritization, roadmapping, and organizational change
+Agent Lead Hands-on expertise in building agents; coaching for your champions
+Role What We Provide
+Trainers Capability building from beginner AI literacy to advanced agent development
+Platform Team Platform support plus rapid development of capabilities you need
+Starting With a Pilot
+We typically begin with a pilot—a focused engagement that demonstrates value before broader commitment.
+What a pilot includes:
+Training for your coalition core (lead and initial champions)
+Building your ﬁrst production agent together
+Opportunity mapping to identify where agents could add value
+Clear results that demonstrate what's possible
+Pilot timeline: 4-6 weeks
+The pilot gives both sides conﬁdence. You see real results and understand what working with Abundly is like.
+We understand your organization and opportunities. This shared understanding makes the full partnership far
+more effective.
+Scaling to Full Partnership
+After a successful pilot, we scale to a full partnership—a long-term commitment to help your entire
+organization succeed with AI agents.
+What a partnership includes:
+Platform access across your organization
+Training from beginner to champion level
+Co-development of many agents
+Ongoing coaching and advisory
+The partnership is designed to make you self-sufﬁcient over time. In early phases, we're heavily involved. As
+your organization develops capability, we shift to coaching and advisory. The goal is for you to build the muscle
+to work with AI agents independently.
+Abundly AI helps organizations build human+AI teams that multiply what they can achieve. To learn more
+about how a partnership could work for your organization, contact us at hello@abundly.ai or visit abundly.ai.

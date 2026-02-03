@@ -1,0 +1,107 @@
+# Skills Library - Cursor Rules
+
+## Project Overview
+Skills Library is a platform for creating, versioning, approving, and sharing AI prompts (skills) across the organization. It's the "intelligence layer" where prompts are reusable, governed assets.
+
+## Tech Stack
+- **Framework**: Next.js 16 with App Router
+- **Language**: TypeScript (strict mode)
+- **Database**: PostgreSQL via Prisma 5
+- **Auth**: JWT via jose library (swappable for Azure AD later)
+- **Styling**: TailwindCSS with Puzzel Design System (see pm/DESIGN_REFERENCE.md)
+
+## Project Structure
+```
+src/
+├── app/
+│   ├── api/           # API routes (Next.js App Router)
+│   └── (pages)/       # UI pages
+├── lib/
+│   ├── auth/          # Auth provider abstraction
+│   ├── db.ts          # Prisma client singleton
+│   └── permissions.ts # RBAC middleware
+├── components/        # React components
+└── types/             # TypeScript types
+pm/                    # Project management docs (job specs)
+prisma/
+├── schema.prisma      # Database schema
+└── seed.ts            # Seed script
+```
+
+## RBAC Model
+Roles: viewer, creator, approver, admin
+Permissions: skills:read, skills:create, skills:update, skills:delete, skills:approve, skills:admin, users:read, users:admin, audit:read
+
+## API Route Patterns
+Always use this pattern for protected routes:
+```typescript
+import { checkAuthWithPermission, PERMISSIONS } from '@/lib/permissions';
+
+export async function GET(request: Request) {
+  const authResult = await checkAuthWithPermission(request, PERMISSIONS.SKILLS_READ);
+  if (!authResult.authorized) return authResult.response;
+  const { user } = authResult;
+  // ... rest of handler
+}
+```
+
+## Database Schema Conventions
+- Use Prisma with PostgreSQL
+- Tables use snake_case via @@map()
+- Models use PascalCase
+- Fields: id (cuid), createdAt, updatedAt
+- Skill versions use `changeNotes` (not changelog)
+- Rejections use `rejectionReason` field
+
+## Code Style
+- Use TypeScript strict mode
+- Prefer async/await over .then()
+- Use NextResponse.json() for API responses
+- Handle errors with try/catch and return proper status codes
+- Use @/ path aliases for imports
+
+## UI Design Rules (Puzzel Nordic Design)
+See pm/DESIGN_REFERENCE.md for full details. Key rules:
+- ✅ White backgrounds only (var(--color-background))
+- ✅ Dark text (var(--color-text))
+- ✅ Purple accents (var(--color-primary): #8b5cf6)
+- ✅ Height-constrained pages (max-height: 100vh)
+- ❌ NO dark backgrounds
+- ❌ NO glass morphism
+- ❌ NO cyan/teal colors
+- Use CSS variables from globals.css, not hardcoded values
+
+## Current Status
+Completed (JOB-01 to JOB-07, JOB-13):
+- Project scaffolding
+- Database schema with RBAC
+- Auth provider with JWT
+- Authorization middleware
+- Skills CRUD API
+- Version management API
+- Approval workflow API
+- Audit Logging
+
+Pending (JOB-08 to JOB-12):
+- MCP Server (expose skills to AI agents)
+- Skills Browser UI
+- Skill Editor UI
+- Approval Dashboard UI
+- Admin Panel UI
+
+## Job Documentation
+Read pm/PROJECT_REFERENCE.md for architecture overview.
+Read pm/JOB-XX_*.md files for detailed specs of each feature.
+
+## Testing
+- Test API routes with curl or Postman
+- Default admin: admin@puzzel.com / admin123
+- Run `pnpm db:seed` to reset test data
+
+## Git Commits
+Use conventional commits:
+- feat: new feature
+- fix: bug fix
+- refactor: code refactoring
+- docs: documentation
+- chore: maintenance
