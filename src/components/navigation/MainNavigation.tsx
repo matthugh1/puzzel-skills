@@ -32,6 +32,12 @@ const userNavItems: NavItem[] = [
     requiresPermission: 'align:read',
   },
   {
+    href: '/align/opportunities',
+    label: 'Align Opportunities',
+    requiresAuth: true,
+    requiresPermission: 'align:read',
+  },
+  {
     href: '/align/wizard',
     label: 'Align Wizard',
     requiresAuth: true,

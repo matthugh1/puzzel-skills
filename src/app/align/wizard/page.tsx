@@ -48,7 +48,7 @@ export default function AlignWizardPage() {
           status: 'ACTIVE',
         }),
       });
-      router.push('/align');
+      router.push('/align/opportunities');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create alignment snapshot');
     } finally {

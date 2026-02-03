@@ -60,20 +60,37 @@ export default async function AlignPage() {
               Establish direction, prioritize opportunities, and define guardrails.
             </p>
           </div>
-          <Link
-            href="/align/wizard"
-            style={{
-              padding: 'var(--spacing-sm) var(--spacing-md)',
-              background: 'var(--color-primary)',
-              color: 'var(--color-on-primary)',
-              borderRadius: 'var(--radius-md)',
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-            }}
-          >
-            Start Align Wizard
-          </Link>
+          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
+            <Link
+              href="/align/wizard"
+              style={{
+                padding: 'var(--spacing-sm) var(--spacing-md)',
+                background: 'var(--color-primary)',
+                color: 'var(--color-on-primary)',
+                borderRadius: 'var(--radius-md)',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+              }}
+            >
+              Start Align Wizard
+            </Link>
+            <Link
+              href="/align/opportunities"
+              style={{
+                padding: 'var(--spacing-sm) var(--spacing-md)',
+                background: 'var(--color-surface-secondary)',
+                color: 'var(--color-text)',
+                borderRadius: 'var(--radius-md)',
+                textDecoration: 'none',
+                border: '1px solid var(--color-border)',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+              }}
+            >
+              Go to Opportunities
+            </Link>
+          </div>
         </div>
       </header>
 
