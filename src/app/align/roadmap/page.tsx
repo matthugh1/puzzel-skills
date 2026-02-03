@@ -1,16 +1,16 @@
 import Link from 'next/link';
 import { db } from '@/lib/db';
-import { AlignOpportunities } from '@/components/align/AlignOpportunities';
+import { AlignRoadmap } from '@/components/align/AlignRoadmap';
 
-export default async function AlignOpportunitiesPage() {
+export default async function AlignRoadmapPage() {
   const latestSnapshot = await db.alignmentSnapshot.findFirst({
     orderBy: { updatedAt: 'desc' },
   });
 
-  const opportunities = latestSnapshot
-    ? await db.opportunity.findMany({
+  const roadmapItems = latestSnapshot
+    ? await db.roadmapItem.findMany({
         where: { snapshotId: latestSnapshot.id },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { priority: 'asc' },
       })
     : [];
 
@@ -32,19 +32,19 @@ export default async function AlignOpportunitiesPage() {
               fontFamily: 'var(--font-display)',
               color: 'var(--color-text)',
             }}>
-              Align: Opportunities
+              Align: Roadmap
             </h1>
             <p style={{
               margin: 'var(--spacing-xs) 0 0 0',
               color: 'var(--color-text-secondary)',
               fontSize: '0.95rem',
             }}>
-              Step 2 of Align. Capture and score candidate use cases.
+              Step 3 of Align. Prioritize near-term delivery.
             </p>
           </div>
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
             <Link
-              href="/align"
+              href="/align/opportunities"
               style={{
                 padding: 'var(--spacing-sm) var(--spacing-md)',
                 background: 'var(--color-surface-secondary)',
@@ -56,10 +56,10 @@ export default async function AlignOpportunitiesPage() {
                 fontSize: '0.9rem',
               }}
             >
-              Back to Align
+              Back to Opportunities
             </Link>
             <Link
-              href="/align/wizard"
+              href="/align"
               style={{
                 padding: 'var(--spacing-sm) var(--spacing-md)',
                 background: 'var(--color-primary)',
@@ -70,22 +70,7 @@ export default async function AlignOpportunitiesPage() {
                 fontSize: '0.9rem',
               }}
             >
-              Start Over
-            </Link>
-            <Link
-              href="/align/roadmap"
-              style={{
-                padding: 'var(--spacing-sm) var(--spacing-md)',
-                background: 'var(--color-surface-secondary)',
-                color: 'var(--color-text)',
-                borderRadius: 'var(--radius-md)',
-                textDecoration: 'none',
-                border: '1px solid var(--color-border)',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-              }}
-            >
-              Continue to Roadmap
+              Back to Align
             </Link>
           </div>
         </div>
@@ -105,7 +90,7 @@ export default async function AlignOpportunitiesPage() {
             </div>
           </section>
         ) : (
-          <AlignOpportunities snapshotId={latestSnapshot.id} opportunities={opportunities} />
+          <AlignRoadmap snapshotId={latestSnapshot.id} roadmapItems={roadmapItems} />
         )}
       </main>
     </div>
