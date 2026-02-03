@@ -84,8 +84,8 @@ export function ApprovalCard({
               </h3>
               <span
                 style={{
-                  background: '#fef3c7',
-                  color: '#92400e',
+                  background: 'var(--color-warning-bg)',
+                  color: 'var(--color-warning-text)',
                   padding: '2px var(--spacing-sm)',
                   borderRadius: 'var(--radius-sm)',
                   fontSize: '0.75rem',

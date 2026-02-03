@@ -84,9 +84,9 @@ export default function MySkillsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PUBLISHED':
-        return { bg: '#d1fae5', text: '#065f46' };
+        return { bg: 'var(--color-success-bg)', text: 'var(--color-success-text)' };
       case 'PENDING_APPROVAL':
-        return { bg: '#fef3c7', text: '#92400e' };
+        return { bg: 'var(--color-warning-bg)', text: 'var(--color-warning-text)' };
       case 'DRAFT':
         return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-secondary)' };
       default:
@@ -131,7 +131,7 @@ export default function MySkillsPage() {
             style={{
               padding: 'var(--spacing-sm) var(--spacing-lg)',
               background: 'var(--color-primary)',
-              color: 'white',
+              color: 'var(--color-on-primary)',
               border: 'none',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
@@ -165,8 +165,8 @@ export default function MySkillsPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -191,7 +191,7 @@ export default function MySkillsPage() {
               style={{
                 padding: 'var(--spacing-sm) var(--spacing-lg)',
                 background: 'var(--color-primary)',
-                color: 'white',
+                color: 'var(--color-on-primary)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: '0.875rem',
@@ -309,7 +309,7 @@ export default function MySkillsPage() {
                       style={{
                         padding: 'var(--spacing-xs) var(--spacing-md)',
                         background: 'var(--color-primary)',
-                        color: 'white',
+                        color: 'var(--color-on-primary)',
                         border: 'none',
                         borderRadius: 'var(--radius-md)',
                         fontSize: '0.875rem',

@@ -49,6 +49,13 @@ export function SkillDetail({ skill, versions, latestPublished }: SkillDetailPro
     }
   };
 
+  const infoItems = [
+    skill.category ? { label: 'Category', value: skill.category } : null,
+    { label: 'Owner', value: skill.owner.name || skill.owner.email },
+    { label: 'Status', value: skill.status.toLowerCase().replace('_', ' ') },
+    { label: 'Visibility', value: skill.visibility },
+  ].filter((item): item is { label: string; value: string } => Boolean(item));
+
   return (
     <div>
       {/* Header */}
@@ -64,7 +71,7 @@ export function SkillDetail({ skill, versions, latestPublished }: SkillDetailPro
           <div style={{ flex: 1 }}>
             <h1
               style={{
-                fontSize: '2.25rem',
+                fontSize: '2rem',
                 fontWeight: 700,
                 marginBottom: 'var(--spacing-md)',
                 fontFamily: 'var(--font-display)',
@@ -89,18 +96,23 @@ export function SkillDetail({ skill, versions, latestPublished }: SkillDetailPro
           {latestPublished && (
             <button
               onClick={handleCopyPrompt}
+              className="btn"
               style={{
                 padding: 'var(--spacing-sm) var(--spacing-lg)',
                 background: copied ? 'var(--color-success)' : 'var(--color-primary)',
-                color: 'white',
-                border: 'none',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontFamily: 'var(--font-body)',
+                color: 'var(--color-on-primary)',
+                border: copied ? '1px solid var(--color-success)' : '1px solid var(--color-primary)',
                 whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={(e) => {
+                if (!copied) {
+                  e.currentTarget.style.background = 'var(--color-primary-dark)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!copied) {
+                  e.currentTarget.style.background = 'var(--color-primary)';
+                }
               }}
             >
               {copied ? '✓ Copied!' : 'Copy Prompt'}
@@ -113,53 +125,34 @@ export function SkillDetail({ skill, versions, latestPublished }: SkillDetailPro
           style={{
             display: 'flex',
             flexWrap: 'wrap',
-            gap: 'var(--spacing-md)',
-            padding: 'var(--spacing-md)',
+            gap: 0,
+            padding: 'var(--spacing-sm) var(--spacing-md)',
             background: 'var(--color-surface-secondary)',
             borderRadius: 'var(--radius-md)',
-            fontSize: '0.875rem',
+            fontSize: '0.8125rem',
+            border: '1px solid var(--color-border-muted)',
           }}
         >
-          {skill.category && (
-            <div>
-              <span style={{ color: 'var(--color-text-muted)', marginRight: 'var(--spacing-xs)' }}>
-                Category:
-              </span>
-              <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>
-                {skill.category}
-              </span>
-            </div>
-          )}
-          <div>
-            <span style={{ color: 'var(--color-text-muted)', marginRight: 'var(--spacing-xs)' }}>
-              Owner:
-            </span>
-            <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>
-              {skill.owner.name || skill.owner.email}
-            </span>
-          </div>
-          <div>
-            <span style={{ color: 'var(--color-text-muted)', marginRight: 'var(--spacing-xs)' }}>
-              Status:
-            </span>
-            <span
+          {infoItems.map((item, index) => (
+            <div
+              key={item.label}
               style={{
-                color: 'var(--color-text)',
-                fontWeight: 500,
-                textTransform: 'capitalize',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-xs)',
+                padding: 'var(--spacing-sm) var(--spacing-md)',
+                borderRight:
+                  index < infoItems.length - 1
+                    ? '1px solid var(--color-border-muted)'
+                    : 'none',
               }}
             >
-              {skill.status.toLowerCase().replace('_', ' ')}
-            </span>
-          </div>
-          <div>
-            <span style={{ color: 'var(--color-text-muted)', marginRight: 'var(--spacing-xs)' }}>
-              Visibility:
-            </span>
-            <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>
-              {skill.visibility}
-            </span>
-          </div>
+              <span style={{ color: 'var(--color-text-muted)' }}>{item.label}:</span>
+              <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>
+                {item.value}
+              </span>
+            </div>
+          ))}
         </div>
 
         {/* Tags */}
@@ -179,8 +172,8 @@ export function SkillDetail({ skill, versions, latestPublished }: SkillDetailPro
                   background: 'var(--color-surface-tertiary)',
                   color: 'var(--color-text-secondary)',
                   padding: 'var(--spacing-xs) var(--spacing-sm)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.875rem',
+                  borderRadius: '999px',
+                  fontSize: '0.75rem',
                 }}
               >
                 {tag}
@@ -215,7 +208,7 @@ export function SkillDetail({ skill, versions, latestPublished }: SkillDetailPro
           <div
             style={{
               background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
+              border: '1px solid var(--color-border-muted)',
               borderRadius: 'var(--radius-md)',
               padding: 'var(--spacing-lg)',
             }}
@@ -225,9 +218,9 @@ export function SkillDetail({ skill, versions, latestPublished }: SkillDetailPro
                 margin: 0,
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
-                fontFamily: 'var(--font-mono, monospace)',
+                fontFamily: 'var(--font-mono)',
                 fontSize: '0.875rem',
-                lineHeight: 1.6,
+                lineHeight: 1.7,
                 color: 'var(--color-text)',
               }}
             >
@@ -241,7 +234,7 @@ export function SkillDetail({ skill, versions, latestPublished }: SkillDetailPro
                 padding: 'var(--spacing-md)',
                 background: 'var(--color-surface-secondary)',
                 borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
+                fontSize: '0.8125rem',
                 color: 'var(--color-text-secondary)',
               }}
             >

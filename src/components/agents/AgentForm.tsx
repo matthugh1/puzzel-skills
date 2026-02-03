@@ -143,7 +143,7 @@ export function AgentForm({ initialData, onSubmit, onCancel, isLoading }: AgentF
                         flex: 1,
                         padding: 'var(--spacing-sm)',
                         background: 'var(--color-primary)',
-                        color: 'white',
+                        color: 'var(--color-on-primary)',
                         border: 'none',
                         borderRadius: 'var(--radius-md)',
                         fontWeight: 500,

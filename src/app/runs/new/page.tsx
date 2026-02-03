@@ -199,7 +199,7 @@ export default function CreateRunPage() {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-primary)';
-                    e.currentTarget.style.background = 'rgba(139, 92, 246, 0.05)';
+                    e.currentTarget.style.background = 'var(--color-primary-5)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-border)';
@@ -274,7 +274,7 @@ export default function CreateRunPage() {
                 height: '32px',
                 borderRadius: '50%',
                 background: 'var(--color-primary)',
-                color: 'white',
+                color: 'var(--color-on-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -298,7 +298,7 @@ export default function CreateRunPage() {
                 height: '32px',
                 borderRadius: '50%',
                 background: goal.trim() ? 'var(--color-primary)' : 'var(--color-surface-secondary)',
-                color: goal.trim() ? 'white' : 'var(--color-text-secondary)',
+                color: goal.trim() ? 'var(--color-on-primary)' : 'var(--color-text-secondary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -315,7 +315,7 @@ export default function CreateRunPage() {
             <div
               style={{
                 padding: 'var(--spacing-md)',
-                background: 'rgba(139, 92, 246, 0.1)',
+                background: 'var(--color-primary-10)',
                 border: '1px solid var(--color-primary)',
                 borderRadius: 'var(--radius-md)',
                 marginBottom: 'var(--spacing-md)',
@@ -551,8 +551,8 @@ export default function CreateRunPage() {
             <div
               style={{
                 padding: 'var(--spacing-md)',
-                background: '#fee2e2',
-                color: '#991b1b',
+                background: 'var(--color-danger-bg)',
+                color: 'var(--color-danger-text)',
                 borderRadius: 'var(--radius-md)',
               }}
             >
@@ -591,7 +591,7 @@ export default function CreateRunPage() {
               style={{
                 padding: 'var(--spacing-md) var(--spacing-lg)',
                 background: 'var(--color-primary)',
-                color: 'white',
+                color: 'var(--color-on-primary)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: '0.875rem',

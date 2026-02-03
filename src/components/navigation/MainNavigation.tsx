@@ -31,6 +31,12 @@ const userNavItems: NavItem[] = [
     requiresAuth: true,
     requiresPermission: 'align:read',
   },
+  {
+    href: '/align/wizard',
+    label: 'Align Wizard',
+    requiresAuth: true,
+    requiresPermission: 'align:read',
+  },
   { href: '/workflows', label: 'Workflows', requiresAuth: true },
   { href: '/agents', label: 'Agents', requiresAuth: true },
   { href: '/integrations', label: 'Integrations', requiresAuth: true },
@@ -124,9 +130,9 @@ export function MainNavigation() {
             fontSize: '0.875rem',
             fontWeight: isActive ? 600 : 400,
             color: isActive ? 'var(--color-primary)' : 'var(--color-text)',
-            background: isActive ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
-            borderLeft: isActive ? '3px solid var(--color-primary)' : '3px solid transparent',
-            transition: 'all 0.2s ease',
+            background: isActive ? 'var(--color-primary-10)' : 'transparent',
+            borderLeft: isActive ? '2px solid var(--color-primary)' : '2px solid transparent',
+            transition: 'all 0.15s ease',
             fontFamily: 'var(--font-body)',
           }}
           onMouseEnter={(e) => {
@@ -151,7 +157,7 @@ export function MainNavigation() {
       style={{
         width: '240px',
         background: 'var(--color-surface)',
-        borderRight: '1px solid var(--color-border)',
+        borderRight: '1px solid var(--color-border-muted)',
         padding: 'var(--spacing-lg)',
         height: '100%',
         overflowY: 'auto',
@@ -163,7 +169,7 @@ export function MainNavigation() {
       <div style={{ flexShrink: 0 }}>
         <h2
           style={{
-            fontSize: '1.25rem',
+            fontSize: '1.125rem',
             fontWeight: 600,
             marginBottom: 'var(--spacing-xl)',
             fontFamily: 'var(--font-display)',
@@ -201,10 +207,10 @@ export function MainNavigation() {
         >
           <h3
             style={{
-              fontSize: '0.75rem',
+              fontSize: '0.6875rem',
               fontWeight: 600,
               textTransform: 'uppercase',
-              letterSpacing: '0.05em',
+              letterSpacing: '0.12em',
               color: 'var(--color-text-secondary)',
               marginBottom: 'var(--spacing-md)',
               fontFamily: 'var(--font-body)',
@@ -231,7 +237,7 @@ export function MainNavigation() {
         style={{
           marginTop: 'auto',
           paddingTop: 'var(--spacing-xl)',
-          borderTop: '1px solid var(--color-border)',
+          borderTop: '1px solid var(--color-border-muted)',
         }}
       >
         {user ? (
@@ -272,6 +278,13 @@ export function MainNavigation() {
                 borderRadius: 'var(--radius-md)',
                 cursor: 'pointer',
                 fontFamily: 'var(--font-body)',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--color-surface-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
               }}
             >
               Sign Out
@@ -286,12 +299,19 @@ export function MainNavigation() {
               fontSize: '0.875rem',
               fontWeight: 500,
               background: 'var(--color-primary)',
-              color: 'white',
+              color: 'var(--color-on-primary)',
               border: 'none',
               borderRadius: 'var(--radius-md)',
               textDecoration: 'none',
               textAlign: 'center',
               fontFamily: 'var(--font-body)',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--color-primary-dark)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--color-primary)';
             }}
           >
             Sign In

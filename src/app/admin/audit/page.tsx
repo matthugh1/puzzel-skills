@@ -121,7 +121,7 @@ export default function AuditLogPage() {
             style={{
               padding: 'var(--spacing-sm) var(--spacing-lg)',
               background: logs.length === 0 ? 'var(--color-surface-secondary)' : 'var(--color-primary)',
-              color: logs.length === 0 ? 'var(--color-text-muted)' : 'white',
+              color: logs.length === 0 ? 'var(--color-text-muted)' : 'var(--color-on-primary)',
               border: 'none',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
@@ -230,8 +230,8 @@ export default function AuditLogPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -417,7 +417,7 @@ export default function AuditLogPage() {
                     style={{
                       padding: 'var(--spacing-xs) var(--spacing-md)',
                       background: pagination.offset === 0 ? 'var(--color-surface-secondary)' : 'var(--color-primary)',
-                      color: pagination.offset === 0 ? 'var(--color-text-muted)' : 'white',
+                      color: pagination.offset === 0 ? 'var(--color-text-muted)' : 'var(--color-on-primary)',
                       border: 'none',
                       borderRadius: 'var(--radius-md)',
                       fontSize: '0.875rem',
@@ -433,7 +433,7 @@ export default function AuditLogPage() {
                     style={{
                       padding: 'var(--spacing-xs) var(--spacing-md)',
                       background: !pagination.hasMore ? 'var(--color-surface-secondary)' : 'var(--color-primary)',
-                      color: !pagination.hasMore ? 'var(--color-text-muted)' : 'white',
+                      color: !pagination.hasMore ? 'var(--color-text-muted)' : 'var(--color-on-primary)',
                       border: 'none',
                       borderRadius: 'var(--radius-md)',
                       fontSize: '0.875rem',

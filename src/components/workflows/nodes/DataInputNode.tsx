@@ -17,30 +17,30 @@ export function DataInputNode({ data, selected }: NodeProps<DataInputNodeData>) 
     <div
       style={{
         padding: '12px 16px',
-        background: selected ? '#e0e7ff' : '#f3f4f6',
-        border: `2px solid ${selected ? '#6366f1' : '#9ca3af'}`,
+        background: selected ? 'var(--color-accent-bg)' : 'var(--color-neutral-bg)',
+        border: `2px solid ${selected ? 'var(--color-primary)' : 'var(--color-neutral-border)'}`,
         borderRadius: 'var(--radius-md)',
         minWidth: '180px',
-        boxShadow: selected ? '0 4px 12px rgba(99, 102, 241, 0.2)' : '0 2px 4px rgba(0,0,0,0.1)',
+        boxShadow: selected ? 'var(--shadow-selected)' : 'var(--shadow-sm)',
         transition: 'all 0.2s ease',
         fontFamily: 'var(--font-body)',
       }}
     >
-      <Handle type="target" position={Position.Top} style={{ background: '#6366f1' }} />
+      <Handle type="target" position={Position.Top} style={{ background: 'var(--color-primary)' }} />
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
         <div
           style={{
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            background: '#6366f1',
+            background: 'var(--color-primary)',
           }}
         />
         <div
           style={{
             fontSize: '0.75rem',
             fontWeight: 600,
-            color: '#6366f1',
+            color: 'var(--color-primary)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}
@@ -57,7 +57,7 @@ export function DataInputNode({ data, selected }: NodeProps<DataInputNodeData>) 
       >
         {hasSchema ? 'Form Input' : 'Unconfigured'}
       </div>
-      <Handle type="source" position={Position.Bottom} style={{ background: '#6366f1' }} />
+      <Handle type="source" position={Position.Bottom} style={{ background: 'var(--color-primary)' }} />
     </div>
   );
 }

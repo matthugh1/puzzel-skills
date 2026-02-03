@@ -17,30 +17,30 @@ export function MergeNode({ data, selected }: NodeProps<MergeNodeData>) {
     <div
       style={{
         padding: '12px 16px',
-        background: selected ? '#dbeafe' : '#eff6ff',
-        border: `2px solid ${selected ? '#3b82f6' : '#60a5fa'}`,
+        background: selected ? 'var(--color-info-bg)' : 'var(--color-info-bg)',
+        border: `2px solid ${selected ? 'var(--color-info-text)' : 'var(--color-info-border)'}`,
         borderRadius: 'var(--radius-md)',
         minWidth: '180px',
-        boxShadow: selected ? '0 4px 12px rgba(59, 130, 246, 0.2)' : '0 2px 4px rgba(0,0,0,0.1)',
+        boxShadow: selected ? 'var(--shadow-selected)' : 'var(--shadow-sm)',
         transition: 'all 0.2s ease',
         fontFamily: 'var(--font-body)',
       }}
     >
-      <Handle type="target" position={Position.Top} style={{ background: '#3b82f6' }} />
+      <Handle type="target" position={Position.Top} style={{ background: 'var(--color-info-text)' }} />
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
         <div
           style={{
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            background: '#3b82f6',
+            background: 'var(--color-info-text)',
           }}
         />
         <div
           style={{
             fontSize: '0.75rem',
             fontWeight: 600,
-            color: '#3b82f6',
+            color: 'var(--color-info-text)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}
@@ -57,7 +57,7 @@ export function MergeNode({ data, selected }: NodeProps<MergeNodeData>) {
       >
         {strategy}
       </div>
-      <Handle type="source" position={Position.Bottom} style={{ background: '#3b82f6' }} />
+      <Handle type="source" position={Position.Bottom} style={{ background: 'var(--color-info-text)' }} />
     </div>
   );
 }

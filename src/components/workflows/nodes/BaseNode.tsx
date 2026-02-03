@@ -21,16 +21,16 @@ export function BaseNode({ data, selected }: NodeProps<BaseNodeData>) {
     <div
       style={{
         padding: '12px 16px',
-        background: selected ? 'var(--color-primary-light)' : 'white',
+        background: selected ? 'var(--color-primary-light)' : 'var(--color-surface)',
         border: `2px solid ${selected ? 'var(--color-primary)' : 'var(--color-border)'}`,
         borderRadius: 'var(--radius-md)',
         minWidth: '150px',
-        boxShadow: selected ? '0 4px 12px rgba(139, 92, 246, 0.2)' : '0 2px 4px rgba(0,0,0,0.1)',
+        boxShadow: selected ? 'var(--shadow-selected)' : 'var(--shadow-sm)',
         transition: 'all 0.2s ease',
         fontFamily: 'var(--font-body)',
       }}
     >
-      <Handle type="target" position={Position.Top} style={{ background: '#555' }} />
+      <Handle type="target" position={Position.Top} style={{ background: 'var(--color-text-muted)' }} />
       <div
         style={{
           fontSize: '0.875rem',
@@ -41,7 +41,7 @@ export function BaseNode({ data, selected }: NodeProps<BaseNodeData>) {
       >
         {label}
       </div>
-      <Handle type="source" position={Position.Bottom} style={{ background: '#555' }} />
+      <Handle type="source" position={Position.Bottom} style={{ background: 'var(--color-text-muted)' }} />
     </div>
   );
 }

@@ -97,9 +97,9 @@ export default function ApprovalHistoryPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PUBLISHED':
-        return { bg: '#d1fae5', text: '#065f46' };
+        return { bg: 'var(--color-success-bg)', text: 'var(--color-success-text)' };
       case 'REJECTED':
-        return { bg: '#fee2e2', text: '#991b1b' };
+        return { bg: 'var(--color-danger-bg)', text: 'var(--color-danger-text)' };
       default:
         return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-secondary)' };
     }
@@ -174,8 +174,8 @@ export default function ApprovalHistoryPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -307,13 +307,13 @@ export default function ApprovalHistoryPage() {
                           style={{
                             marginTop: 'var(--spacing-sm)',
                             padding: 'var(--spacing-sm)',
-                            background: '#fee2e2',
+                            background: 'var(--color-danger-bg)',
                             borderRadius: 'var(--radius-sm)',
                           }}
                         >
                           <p
                             style={{
-                              color: '#991b1b',
+                              color: 'var(--color-danger-text)',
                               fontSize: '0.875rem',
                               margin: 0,
                               fontWeight: 500,

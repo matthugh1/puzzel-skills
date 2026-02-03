@@ -146,8 +146,8 @@ export default function WorkflowHistoryPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}

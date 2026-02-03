@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { apiRequest } from '@/lib/api-client';
 
 const steps = [
-  { title: 'Direction', description: 'Define goals, constraints, and success metrics.' },
+  { title: 'Clarify', description: 'Capture the question, outcomes, and success metrics.' },
   { title: 'Opportunities', description: 'Capture and score candidate use cases.' },
   { title: 'Roadmap v1', description: 'Prioritize top initiatives for the next phase.' },
   { title: 'Coalition', description: 'Identify sponsor, lead, and champions.' },
@@ -16,7 +16,10 @@ const steps = [
 export default function AlignWizardPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
-  const [goals, setGoals] = useState('');
+  const [question, setQuestion] = useState('');
+  const [outcomes, setOutcomes] = useState('');
+  const [metrics, setMetrics] = useState('');
+  const [stakeholders, setStakeholders] = useState('');
   const [constraints, setConstraints] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,8 +30,11 @@ export default function AlignWizardPage() {
     setError(null);
 
     const summary = [
-      goals.trim() ? `Goals:\\n${goals.trim()}` : null,
-      constraints.trim() ? `Constraints:\\n${constraints.trim()}` : null,
+      question.trim() ? `Question:\\n${question.trim()}` : null,
+      outcomes.trim() ? `Outcomes (one per line):\\n${outcomes.trim()}` : null,
+      metrics.trim() ? `Success metrics (one per line):\\n${metrics.trim()}` : null,
+      stakeholders.trim() ? `Stakeholders (one per line):\\n${stakeholders.trim()}` : null,
+      constraints.trim() ? `Constraints (one per line):\\n${constraints.trim()}` : null,
     ]
       .filter(Boolean)
       .join('\\n\\n');
@@ -153,10 +159,10 @@ export default function AlignWizardPage() {
                 margin: '0 0 var(--spacing-sm) 0',
                 color: 'var(--color-text)',
               }}>
-                Step 1: Direction
+                Step 1: Clarify The Question
               </h2>
               <p style={{ color: 'var(--color-text-secondary)', margin: 0 }}>
-                Define the goals and constraints for your AI transformation.
+                Capture the question, desired outcomes, success metrics, stakeholders, and constraints.
               </p>
             </div>
 
@@ -187,12 +193,66 @@ export default function AlignWizardPage() {
               </label>
 
               <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
-                <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>Goals</span>
+                <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>Clarify the question</span>
                 <textarea
                   rows={4}
-                  value={goals}
-                  onChange={(event) => setGoals(event.target.value)}
-                  placeholder="e.g., reduce cycle time by 30%, improve response quality"
+                  value={question}
+                  onChange={(event) => setQuestion(event.target.value)}
+                  placeholder="What is the most important business question AI should help us answer?"
+                  style={{
+                    width: '100%',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--color-border)',
+                    padding: 'var(--spacing-sm)',
+                    fontFamily: 'var(--font-body)',
+                    color: 'var(--color-text)',
+                  }}
+                />
+              </label>
+
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>Desired outcomes</span>
+                <textarea
+                  rows={3}
+                  value={outcomes}
+                  onChange={(event) => setOutcomes(event.target.value)}
+                  placeholder="One per line, e.g., reduce cycle time by 30%"
+                  style={{
+                    width: '100%',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--color-border)',
+                    padding: 'var(--spacing-sm)',
+                    fontFamily: 'var(--font-body)',
+                    color: 'var(--color-text)',
+                  }}
+                />
+              </label>
+
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>Success metrics</span>
+                <textarea
+                  rows={3}
+                  value={metrics}
+                  onChange={(event) => setMetrics(event.target.value)}
+                  placeholder="One per line, e.g., 95% deflection within 90 days"
+                  style={{
+                    width: '100%',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--color-border)',
+                    padding: 'var(--spacing-sm)',
+                    fontFamily: 'var(--font-body)',
+                    color: 'var(--color-text)',
+                  }}
+                />
+              </label>
+
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>Key stakeholders</span>
+                <textarea
+                  rows={3}
+                  value={stakeholders}
+                  onChange={(event) => setStakeholders(event.target.value)}
+                  placeholder="One per line, e.g., COO, Support Ops Lead"
                   style={{
                     width: '100%',
                     borderRadius: 'var(--radius-md)',
@@ -210,7 +270,7 @@ export default function AlignWizardPage() {
                   rows={3}
                   value={constraints}
                   onChange={(event) => setConstraints(event.target.value)}
-                  placeholder="e.g., no PII, approvals required for external comms"
+                  placeholder="One per line, e.g., no PII, approvals required for external comms"
                   style={{
                     width: '100%',
                     borderRadius: 'var(--radius-md)',
@@ -248,7 +308,7 @@ export default function AlignWizardPage() {
                   style={{
                     padding: 'var(--spacing-sm) var(--spacing-md)',
                     background: 'var(--color-primary)',
-                    color: 'white',
+                    color: 'var(--color-on-primary)',
                     border: 'none',
                     borderRadius: 'var(--radius-md)',
                     cursor: loading ? 'not-allowed' : 'pointer',

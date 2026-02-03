@@ -189,8 +189,8 @@ export default function ReviewPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -216,8 +216,8 @@ export default function ReviewPage() {
               <div
                 style={{
                   padding: 'var(--spacing-md)',
-                  background: '#fef3c7',
-                  color: '#92400e',
+                  background: 'var(--color-warning-bg)',
+                  color: 'var(--color-warning-text)',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.875rem',
                 }}

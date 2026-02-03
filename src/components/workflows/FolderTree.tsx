@@ -229,8 +229,8 @@ export function FolderTree({ selectedFolderId, onFolderSelect, onWorkflowMove }:
       <div
         style={{
           padding: 'var(--spacing-md)',
-          background: '#fee2e2',
-          color: '#991b1b',
+          background: 'var(--color-danger-bg)',
+          color: 'var(--color-danger-text)',
           borderRadius: 'var(--radius-md)',
           fontSize: '0.875rem',
         }}

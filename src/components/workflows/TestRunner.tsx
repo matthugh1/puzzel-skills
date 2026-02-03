@@ -392,11 +392,11 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
     switch (status) {
       case 'complete':
       case 'succeeded':
-        return { bg: '#d1fae5', text: '#065f46', border: '#10b981' };
+        return { bg: 'var(--color-success-bg)', text: 'var(--color-success-text)', border: 'var(--color-success)' };
       case 'running':
-        return { bg: '#dbeafe', text: '#1e40af', border: '#3b82f6' };
+        return { bg: 'var(--color-info-bg)', text: 'var(--color-info-text)', border: 'var(--color-info-text)' };
       case 'failed':
-        return { bg: '#fee2e2', text: '#991b1b', border: '#ef4444' };
+        return { bg: 'var(--color-danger-bg)', text: 'var(--color-danger-text)', border: 'var(--color-danger)' };
       case 'pending':
         return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-secondary)', border: 'var(--color-border)' };
       default:
@@ -420,7 +420,7 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
         width: '500px',
         maxWidth: '90vw',
         background: 'var(--color-background)',
-        boxShadow: '-4px 0 12px rgba(0, 0, 0, 0.15)',
+        boxShadow: 'var(--shadow-panel)',
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
@@ -762,7 +762,7 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
               style={{
                 padding: 'var(--spacing-sm) var(--spacing-lg)',
                 background: 'var(--color-primary)',
-                color: 'white',
+                color: 'var(--color-on-primary)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: '0.875rem',
@@ -781,10 +781,10 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
             style={{
               marginBottom: 'var(--spacing-md)',
               padding: 'var(--spacing-md)',
-              background: '#fee2e2',
-              border: '1px solid #fca5a5',
+              background: 'var(--color-danger-bg)',
+              border: '1px solid var(--color-danger-border)',
               borderRadius: 'var(--radius-md)',
-              color: '#991b1b',
+              color: 'var(--color-danger-text)',
             }}
           >
             <div style={{ fontWeight: 600, marginBottom: 'var(--spacing-xs)' }}>
@@ -844,8 +844,8 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                   onClick={stopTest}
                   style={{
                     padding: 'var(--spacing-xs) var(--spacing-md)',
-                    background: '#fee2e2',
-                    color: '#991b1b',
+                    background: 'var(--color-danger-bg)',
+                    color: 'var(--color-danger-text)',
                     border: 'none',
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.875rem',
@@ -937,11 +937,11 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                                     <div style={{ 
                                       marginTop: 'var(--spacing-xs)',
                                       padding: 'var(--spacing-xs) var(--spacing-sm)',
-                                      background: '#dbeafe',
-                                      border: '1px solid #93c5fd',
+                                      background: 'var(--color-info-bg)',
+                                      border: '1px solid var(--color-info-border)',
                                       borderRadius: 'var(--radius-sm)',
                                       fontSize: '0.75rem',
-                                      color: '#1e40af',
+                                      color: 'var(--color-info-text)',
                                     }}>
                                       🔧 Tool Executed: {String(metadata.toolId || 'Unknown')}
                                       {metadata.fileRef && (
@@ -959,11 +959,11 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                                     <div style={{ 
                                       marginTop: 'var(--spacing-xs)',
                                       padding: 'var(--spacing-xs) var(--spacing-sm)',
-                                      background: '#f3f4f6',
-                                      border: '1px solid #d1d5db',
+                                      background: 'var(--color-neutral-bg)',
+                                      border: '1px solid var(--color-neutral-border)',
                                       borderRadius: 'var(--radius-sm)',
                                       fontSize: '0.75rem',
-                                      color: '#6b7280',
+                                      color: 'var(--color-neutral-text)',
                                     }}>
                                       🤖 LLM Used: {String(metadata.model || 'Unknown')} ({String(metadata.provider || 'Unknown')})
                                     </div>
@@ -979,11 +979,11 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                                   <div style={{ 
                                     marginTop: 'var(--spacing-xs)',
                                     padding: 'var(--spacing-xs) var(--spacing-sm)',
-                                    background: '#dbeafe',
-                                    border: '1px solid #93c5fd',
+                                    background: 'var(--color-info-bg)',
+                                    border: '1px solid var(--color-info-border)',
                                     borderRadius: 'var(--radius-sm)',
                                     fontSize: '0.75rem',
-                                    color: '#1e40af',
+                                    color: 'var(--color-info-text)',
                                   }}>
                                     🔧 Tool Executed: {toolId || 'Unknown'}
                                   </div>
@@ -1013,8 +1013,8 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                         style={{
                           marginTop: 'var(--spacing-sm)',
                           padding: 'var(--spacing-sm)',
-                          background: '#dbeafe',
-                          color: '#1e40af',
+                          background: 'var(--color-info-bg)',
+                          color: 'var(--color-info-text)',
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '0.875rem',
                           display: 'flex',
@@ -1027,7 +1027,7 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                             width: '8px',
                             height: '8px',
                             borderRadius: '50%',
-                            background: '#3b82f6',
+                            background: 'var(--color-info-text)',
                             animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                           }}
                         />
@@ -1039,9 +1039,9 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                         style={{
                           marginTop: 'var(--spacing-sm)',
                           padding: 'var(--spacing-md)',
-                          background: '#fee2e2',
-                          border: '1px solid #fca5a5',
-                          color: '#991b1b',
+                          background: 'var(--color-danger-bg)',
+                          border: '1px solid var(--color-danger-border)',
+                          color: 'var(--color-danger-text)',
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '0.875rem',
                         }}
@@ -1059,8 +1059,8 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                         style={{
                           marginTop: 'var(--spacing-sm)',
                           padding: 'var(--spacing-sm)',
-                          background: '#d1fae5',
-                          color: '#065f46',
+                          background: 'var(--color-success-bg)',
+                          color: 'var(--color-success-text)',
                           borderRadius: 'var(--radius-sm)',
                           fontSize: '0.875rem',
                           display: 'flex',
@@ -1198,15 +1198,15 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                                     <div style={{ 
                                       marginBottom: 'var(--spacing-sm)',
                                       padding: 'var(--spacing-sm)',
-                                      background: '#f0f9ff',
-                                      border: '1px solid #bae6fd',
+                                      background: 'var(--color-info-bg)',
+                                      border: '1px solid var(--color-info-border)',
                                       borderRadius: 'var(--radius-sm)',
                                     }}>
                                       <div style={{ 
                                         fontSize: '0.75rem', 
                                         fontWeight: 600,
                                         marginBottom: 'var(--spacing-xs)',
-                                        color: '#0369a1'
+                                        color: 'var(--color-info-text)'
                                       }}>
                                         Generated Files:
                                       </div>
@@ -1235,8 +1235,8 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                                               alignItems: 'center',
                                               gap: 'var(--spacing-xs)',
                                               padding: 'var(--spacing-sm) var(--spacing-md)',
-                                              background: '#2563eb',
-                                              color: 'white',
+                                              background: 'var(--color-primary)',
+                                              color: 'var(--color-on-primary)',
                                               textDecoration: 'none',
                                               borderRadius: 'var(--radius-sm)',
                                               fontSize: '0.875rem',
@@ -1247,10 +1247,10 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                                               transition: 'background-color 0.2s',
                                             }}
                                             onMouseEnter={(e) => {
-                                              e.currentTarget.style.background = '#1d4ed8';
+                                              e.currentTarget.style.background = 'var(--color-primary-dark)';
                                             }}
                                             onMouseLeave={(e) => {
-                                              e.currentTarget.style.background = '#2563eb';
+                                              e.currentTarget.style.background = 'var(--color-primary)';
                                             }}
                                           >
                                             <span>📄</span>
@@ -1262,11 +1262,11 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                                   ) : (
                                     <div style={{ 
                                       fontSize: '0.7rem', 
-                                      color: '#6b7280',
+                                      color: 'var(--color-neutral-text)',
                                       fontStyle: 'italic',
                                       marginBottom: 'var(--spacing-xs)',
                                       padding: 'var(--spacing-xs)',
-                                      background: '#f9fafb',
+                                      background: 'var(--color-surface-secondary)',
                                       borderRadius: 'var(--radius-sm)',
                                     }}>
                                       No downloadable files detected. Check console for outputContext structure.
@@ -1332,8 +1332,8 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                     disabled={executionLogs.length === 0}
                     style={{
                       padding: 'var(--spacing-xs) var(--spacing-sm)',
-                      background: copied ? '#10b981' : 'var(--color-primary)',
-                      color: 'white',
+                      background: copied ? 'var(--color-success)' : 'var(--color-primary)',
+                      color: 'var(--color-on-primary)',
                       border: 'none',
                       borderRadius: 'var(--radius-sm)',
                       fontSize: '0.75rem',
@@ -1360,10 +1360,10 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                 >
                   {executionLogs.map((log, idx) => {
                     const levelColors: Record<string, { bg: string; text: string; border: string }> = {
-                      info: { bg: '#dbeafe', text: '#1e40af', border: '#93c5fd' },
-                      success: { bg: '#d1fae5', text: '#065f46', border: '#6ee7b7' },
-                      warn: { bg: '#fef3c7', text: '#92400e', border: '#fcd34d' },
-                      error: { bg: '#fee2e2', text: '#991b1b', border: '#fca5a5' },
+                      info: { bg: 'var(--color-info-bg)', text: 'var(--color-info-text)', border: 'var(--color-info-border)' },
+                      success: { bg: 'var(--color-success-bg)', text: 'var(--color-success-text)', border: 'var(--color-success-border)' },
+                      warn: { bg: 'var(--color-warning-bg)', text: 'var(--color-warning-text)', border: 'var(--color-warning-border)' },
+                      error: { bg: 'var(--color-danger-bg)', text: 'var(--color-danger-text)', border: 'var(--color-danger-border)' },
                     };
                     const colors = levelColors[log.level] || levelColors.info;
                     
@@ -1400,7 +1400,7 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                                 fontSize: '0.65rem',
                                 overflow: 'auto',
                                 maxHeight: '150px',
-                                background: 'rgba(0,0,0,0.05)',
+                                background: 'var(--color-surface-tertiary)',
                                 padding: 'var(--spacing-xs)',
                                 borderRadius: 'var(--radius-sm)',
                               }}
@@ -1493,8 +1493,8 @@ export function TestRunner({ workflowId, plan, onClose, usePlanOverride = false 
                     }}
                     style={{
                       padding: 'var(--spacing-xs) var(--spacing-sm)',
-                      background: copied ? '#10b981' : 'var(--color-primary)',
-                      color: 'white',
+                      background: copied ? 'var(--color-success)' : 'var(--color-primary)',
+                      color: 'var(--color-on-primary)',
                       border: 'none',
                       borderRadius: 'var(--radius-sm)',
                       fontSize: '0.75rem',

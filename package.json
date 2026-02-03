@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "lint:staged": "lint-staged",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -65,7 +65,7 @@
   },
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx}": [
-      "next lint --file"
+      "eslint --max-warnings=0"
     ],
     "**/*.{json,md,css,scss}": [
       "prettier --check"

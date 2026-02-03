@@ -160,8 +160,8 @@ export function PropertyPanel({ selectedStep, onUpdate }: PropertyPanelProps) {
               <div
                 style={{
                   padding: 'var(--spacing-sm)',
-                  background: '#fee2e2',
-                  color: '#991b1b',
+                  background: 'var(--color-danger-bg)',
+                  color: 'var(--color-danger-text)',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.875rem',
                   marginBottom: 'var(--spacing-xs)',
@@ -173,8 +173,8 @@ export function PropertyPanel({ selectedStep, onUpdate }: PropertyPanelProps) {
                   style={{
                     marginTop: 'var(--spacing-xs)',
                     padding: 'var(--spacing-xs) var(--spacing-sm)',
-                    background: '#991b1b',
-                    color: 'white',
+                    background: 'var(--color-danger-text)',
+                    color: 'var(--color-on-primary)',
                     border: 'none',
                     borderRadius: 'var(--radius-sm)',
                     fontSize: '0.75rem',

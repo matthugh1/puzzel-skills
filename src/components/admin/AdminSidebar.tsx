@@ -68,7 +68,7 @@ export function AdminSidebar() {
                     fontSize: '0.875rem',
                     fontWeight: isActive ? 600 : 400,
                     color: isActive ? 'var(--color-primary)' : 'var(--color-text)',
-                    background: isActive ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
+                    background: isActive ? 'var(--color-primary-10)' : 'transparent',
                     borderLeft: isActive ? '3px solid var(--color-primary)' : '3px solid transparent',
                     transition: 'all 0.2s ease',
                     fontFamily: 'var(--font-body)',

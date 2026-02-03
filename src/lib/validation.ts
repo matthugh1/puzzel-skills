@@ -250,6 +250,10 @@ export const validationSchemas = {
     requiresApproval: z.boolean().optional(),
     notes: z.string().max(2000).trim().optional(),
   }),
+
+  alignUserSearch: z.object({
+    search: z.string().min(2).max(200).trim(),
+  }),
 };
 
 /**

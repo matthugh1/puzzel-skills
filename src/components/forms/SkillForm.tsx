@@ -157,7 +157,7 @@ export function SkillForm({
             onFocus={(e) => {
               e.currentTarget.style.borderColor = 'var(--color-primary)';
               e.currentTarget.style.outline = 'none';
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px var(--color-primary-10)';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = errors.name
@@ -206,7 +206,7 @@ export function SkillForm({
             onFocus={(e) => {
               e.currentTarget.style.borderColor = 'var(--color-primary)';
               e.currentTarget.style.outline = 'none';
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
+              e.currentTarget.style.boxShadow = '0 0 0 3px var(--color-primary-10)';
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = 'var(--color-border)';
@@ -296,7 +296,7 @@ export function SkillForm({
               style={{
                 padding: 'var(--spacing-md) var(--spacing-lg)',
                 background: tagInput.trim() ? 'var(--color-primary)' : 'var(--color-surface-secondary)',
-                color: tagInput.trim() ? 'white' : 'var(--color-text-muted)',
+                color: tagInput.trim() ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: '0.875rem',
@@ -466,8 +466,8 @@ export function SkillForm({
           <div
             style={{
               padding: 'var(--spacing-md)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
             }}
@@ -504,7 +504,7 @@ export function SkillForm({
             style={{
               padding: 'var(--spacing-sm) var(--spacing-lg)',
               background: isSubmitting ? 'var(--color-surface-secondary)' : 'var(--color-primary)',
-              color: isSubmitting ? 'var(--color-text-muted)' : 'white',
+              color: isSubmitting ? 'var(--color-text-muted)' : 'var(--color-on-primary)',
               border: 'none',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',

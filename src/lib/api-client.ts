@@ -59,13 +59,6 @@ async function ensureCSRFToken(): Promise<string | null> {
       }
     }
     
-    // If endpoint returned 404, middleware didn't set cookie - wait a bit and retry
-    if (response.status === 404) {
-      // Wait a short time for cookie to be processed
-      await new Promise(resolve => setTimeout(resolve, 100));
-      return getCSRFToken();
-    }
-    
     return null;
   } catch (error) {
     console.error('Failed to fetch CSRF token:', error);

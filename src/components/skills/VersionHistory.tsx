@@ -19,11 +19,11 @@ export function VersionHistory({ versions }: VersionHistoryProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PUBLISHED':
-        return '#d1fae5';
+        return 'var(--color-success-bg)';
       case 'PENDING_APPROVAL':
-        return '#fef3c7';
+        return 'var(--color-warning-bg)';
       case 'REJECTED':
-        return '#fee2e2';
+        return 'var(--color-danger-bg)';
       default:
         return 'var(--color-surface-secondary)';
     }
@@ -32,11 +32,11 @@ export function VersionHistory({ versions }: VersionHistoryProps) {
   const getStatusTextColor = (status: string) => {
     switch (status) {
       case 'PUBLISHED':
-        return '#065f46';
+        return 'var(--color-success-text)';
       case 'PENDING_APPROVAL':
-        return '#92400e';
+        return 'var(--color-warning-text)';
       case 'REJECTED':
-        return '#991b1b';
+        return 'var(--color-danger-text)';
       default:
         return 'var(--color-text-secondary)';
     }
@@ -68,7 +68,7 @@ export function VersionHistory({ versions }: VersionHistoryProps) {
               key={version.id}
               style={{
                 background: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
+                border: '1px solid var(--color-border-muted)',
                 borderRadius: 'var(--radius-md)',
                 padding: 'var(--spacing-md)',
               }}

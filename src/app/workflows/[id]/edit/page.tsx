@@ -153,15 +153,15 @@ export default function EditWorkflowPage() {
       <div className="container mx-auto px-4 py-8">
         <div
           style={{
-            background: '#fef3c7',
-            border: '1px solid #fbbf24',
+            background: 'var(--color-warning-bg)',
+            border: '1px solid var(--color-warning-border)',
             borderRadius: 'var(--radius-md)',
             padding: 'var(--spacing-lg)',
           }}
         >
           <p
             style={{
-              color: '#92400e',
+              color: 'var(--color-warning-text)',
               marginBottom: 'var(--spacing-md)',
               fontSize: '0.875rem',
               fontFamily: 'var(--font-body)',
@@ -180,8 +180,8 @@ export default function EditWorkflowPage() {
             }}
             style={{
               padding: 'var(--spacing-sm) var(--spacing-lg)',
-              background: '#f59e0b',
-              color: 'white',
+              background: 'var(--color-warning)',
+              color: 'var(--color-on-primary)',
               border: 'none',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
@@ -190,10 +190,10 @@ export default function EditWorkflowPage() {
               fontFamily: 'var(--font-body)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#d97706';
+              e.currentTarget.style.background = 'var(--color-warning-text)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#f59e0b';
+              e.currentTarget.style.background = 'var(--color-warning)';
             }}
           >
             Unpublish Workflow
@@ -262,7 +262,7 @@ export default function EditWorkflowPage() {
                 padding: 'var(--spacing-sm) var(--spacing-md)',
                 border: '1px solid var(--color-border)',
                 borderRadius: 'var(--radius-md)',
-                background: 'white',
+                background: 'var(--color-surface)',
                 color: 'var(--color-text)',
                 fontSize: '0.875rem',
                 fontFamily: 'var(--font-body)',
@@ -279,7 +279,7 @@ export default function EditWorkflowPage() {
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 background: 'var(--color-primary)',
-                color: 'white',
+                color: 'var(--color-on-primary)',
                 fontSize: '0.875rem',
                 fontFamily: 'var(--font-body)',
                 cursor: saving ? 'not-allowed' : 'pointer',
@@ -295,10 +295,10 @@ export default function EditWorkflowPage() {
             style={{
               marginTop: 'var(--spacing-md)',
               padding: 'var(--spacing-sm) var(--spacing-md)',
-              background: '#fee2e2',
-              border: '1px solid #fecaca',
+              background: 'var(--color-danger-bg)',
+              border: '1px solid var(--color-danger-border)',
               borderRadius: 'var(--radius-md)',
-              color: '#991b1b',
+              color: 'var(--color-danger-text)',
               fontSize: '0.875rem',
             }}
           >

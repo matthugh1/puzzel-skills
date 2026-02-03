@@ -139,9 +139,9 @@ export function ReviewPanel({
         <div
           style={{
             padding: 'var(--spacing-md)',
-            background: '#fef3c7',
+            background: 'var(--color-warning-bg)',
             borderRadius: 'var(--radius-md)',
-            border: '1px solid #fbbf24',
+            border: '1px solid var(--color-warning-border)',
           }}
         >
           <h3
@@ -149,12 +149,12 @@ export function ReviewPanel({
               fontSize: '0.875rem',
               fontWeight: 600,
               marginBottom: 'var(--spacing-xs)',
-              color: '#92400e',
+              color: 'var(--color-warning-text)',
             }}
           >
             Change Notes
           </h3>
-          <p style={{ fontSize: '0.875rem', color: '#92400e', margin: 0 }}>
+          <p style={{ fontSize: '0.875rem', color: 'var(--color-warning-text)', margin: 0 }}>
             {version.changeNotes}
           </p>
         </div>

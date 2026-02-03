@@ -150,8 +150,8 @@ export default function WorkflowAnalyticsPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -224,7 +224,7 @@ export default function WorkflowAnalyticsPage() {
                   style={{
                     fontSize: '2rem',
                     fontWeight: 700,
-                    color: '#065f46',
+                    color: 'var(--color-success-text)',
                   }}
                 >
                   {analytics.metrics.successRate.toFixed(1)}%
@@ -278,7 +278,7 @@ export default function WorkflowAnalyticsPage() {
                   style={{
                     fontSize: '2rem',
                     fontWeight: 700,
-                    color: '#991b1b',
+                    color: 'var(--color-danger-text)',
                   }}
                 >
                   {analytics.metrics.errorRate.toFixed(1)}%
@@ -351,11 +351,11 @@ export default function WorkflowAnalyticsPage() {
                             <div
                               style={{
                                 width: `${completedWidth}%`,
-                                background: '#065f46',
+                                background: 'var(--color-success-text)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                color: 'white',
+                                color: 'var(--color-on-primary)',
                                 fontSize: '0.75rem',
                                 fontWeight: 500,
                               }}
@@ -367,11 +367,11 @@ export default function WorkflowAnalyticsPage() {
                             <div
                               style={{
                                 width: `${failedWidth}%`,
-                                background: '#991b1b',
+                                background: 'var(--color-danger-text)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                color: 'white',
+                                color: 'var(--color-on-primary)',
                                 fontSize: '0.75rem',
                                 fontWeight: 500,
                               }}

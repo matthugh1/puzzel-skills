@@ -134,9 +134,9 @@ export default function WorkflowDetailPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PUBLISHED':
-        return { bg: '#d1fae5', text: '#065f46' };
+        return { bg: 'var(--color-success-bg)', text: 'var(--color-success-text)' };
       case 'DRAFT':
-        return { bg: '#e9d5ff', text: '#6b21a8' };
+        return { bg: 'var(--color-accent-bg)', text: 'var(--color-accent-text)' };
       case 'ARCHIVED':
         return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-secondary)' };
       default:
@@ -176,8 +176,8 @@ export default function WorkflowDetailPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
             }}
           >
@@ -305,7 +305,7 @@ export default function WorkflowDetailPage() {
                 style={{
                   padding: 'var(--spacing-sm) var(--spacing-lg)',
                   background: 'var(--color-primary)',
-                  color: 'white',
+                  color: 'var(--color-on-primary)',
                   border: 'none',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.875rem',
@@ -323,7 +323,7 @@ export default function WorkflowDetailPage() {
                 style={{
                   padding: 'var(--spacing-sm) var(--spacing-lg)',
                   background: 'var(--color-primary)',
-                  color: 'white',
+                  color: 'var(--color-on-primary)',
                   border: 'none',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.875rem',
@@ -339,9 +339,9 @@ export default function WorkflowDetailPage() {
                 onClick={handleUnpublish}
                 style={{
                   padding: 'var(--spacing-sm) var(--spacing-lg)',
-                  background: '#fef3c7',
-                  color: '#92400e',
-                  border: '1px solid #fbbf24',
+                  background: 'var(--color-warning-bg)',
+                  color: 'var(--color-warning-text)',
+                  border: '1px solid var(--color-warning-border)',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.875rem',
                   fontWeight: 500,

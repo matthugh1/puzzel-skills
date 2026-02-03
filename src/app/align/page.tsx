@@ -65,7 +65,7 @@ export default async function AlignPage() {
             style={{
               padding: 'var(--spacing-sm) var(--spacing-md)',
               background: 'var(--color-primary)',
-              color: 'white',
+              color: 'var(--color-on-primary)',
               borderRadius: 'var(--radius-md)',
               textDecoration: 'none',
               fontWeight: 600,

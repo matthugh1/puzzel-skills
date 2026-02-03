@@ -60,7 +60,7 @@ export function VariableHelper({ onInsert, existingVariables = [] }: VariableHel
             background: variableName.trim()
               ? 'var(--color-primary)'
               : 'var(--color-surface-secondary)',
-            color: variableName.trim() ? 'white' : 'var(--color-text-muted)',
+            color: variableName.trim() ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
             border: 'none',
             borderRadius: 'var(--radius-md)',
             fontSize: '0.875rem',
@@ -148,7 +148,7 @@ export function VariableHelper({ onInsert, existingVariables = [] }: VariableHel
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'var(--color-primary)';
-                  e.currentTarget.style.color = 'white';
+                  e.currentTarget.style.color = 'var(--color-on-primary)';
                   e.currentTarget.style.borderColor = 'var(--color-primary)';
                 }}
                 onMouseLeave={(e) => {

@@ -57,7 +57,7 @@ export function PromptEditor({
         onFocus={(e) => {
           e.currentTarget.style.borderColor = 'var(--color-primary)';
           e.currentTarget.style.outline = 'none';
-          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
+          e.currentTarget.style.boxShadow = '0 0 0 3px var(--color-primary-10)';
         }}
         onBlur={(e) => {
           e.currentTarget.style.borderColor = 'var(--color-border)';

@@ -194,8 +194,8 @@ export default function PlanPage() {
                   <div style={{
                     padding: '1rem',
                     marginBottom: '1rem',
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    background: 'var(--color-danger-bg)',
+                    border: '1px solid var(--color-danger-border)',
                     borderRadius: '0.375rem',
                     color: 'var(--color-error)',
                   }}>
@@ -213,7 +213,7 @@ export default function PlanPage() {
                     background: loading || !userGoal.trim() 
                       ? 'var(--color-border)' 
                       : 'var(--color-primary)',
-                    color: 'white',
+                    color: 'var(--color-on-primary)',
                     border: 'none',
                     borderRadius: '0.375rem',
                     cursor: loading || !userGoal.trim() ? 'not-allowed' : 'pointer',
@@ -305,8 +305,8 @@ export default function PlanPage() {
                           padding: '1rem',
                           background: tool.exists 
                             ? 'var(--color-background)' 
-                            : 'rgba(239, 68, 68, 0.05)',
-                          border: `1px solid ${tool.exists ? 'var(--color-border)' : 'rgba(239, 68, 68, 0.3)'}`,
+                            : 'var(--color-danger-bg)',
+                          border: `1px solid ${tool.exists ? 'var(--color-border)' : 'var(--color-danger-border)'}`,
                           borderRadius: '0.375rem',
                         }}
                       >
@@ -384,8 +384,8 @@ export default function PlanPage() {
                           padding: '1rem',
                           background: skill.exists 
                             ? 'var(--color-background)' 
-                            : 'rgba(239, 68, 68, 0.05)',
-                          border: `1px solid ${skill.exists ? 'var(--color-border)' : 'rgba(239, 68, 68, 0.3)'}`,
+                            : 'var(--color-danger-bg)',
+                          border: `1px solid ${skill.exists ? 'var(--color-border)' : 'var(--color-danger-border)'}`,
                           borderRadius: '0.375rem',
                         }}
                       >
@@ -478,7 +478,7 @@ export default function PlanPage() {
                             height: '2rem',
                             borderRadius: '50%',
                             background: 'var(--color-primary)',
-                            color: 'white',
+                            color: 'var(--color-on-primary)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -571,7 +571,7 @@ export default function PlanPage() {
                     fontSize: '1rem',
                     fontWeight: 500,
                     background: 'var(--color-primary)',
-                    color: 'white',
+                    color: 'var(--color-on-primary)',
                     border: 'none',
                     borderRadius: '0.375rem',
                     cursor: 'pointer',

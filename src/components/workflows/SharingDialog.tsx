@@ -121,7 +121,7 @@ export function SharingDialog({ workflowId, onClose }: SharingDialogProps) {
         left: 0,
         right: 0,
         bottom: 0,
-        background: 'rgba(0, 0, 0, 0.5)',
+        background: 'var(--color-overlay)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -178,8 +178,8 @@ export function SharingDialog({ workflowId, onClose }: SharingDialogProps) {
           <div
             style={{
               padding: 'var(--spacing-sm) var(--spacing-md)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-md)',
               fontSize: '0.875rem',
@@ -307,7 +307,7 @@ export function SharingDialog({ workflowId, onClose }: SharingDialogProps) {
               style={{
                 padding: 'var(--spacing-sm) var(--spacing-lg)',
                 background: 'var(--color-primary)',
-                color: 'white',
+                color: 'var(--color-on-primary)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: '0.875rem',
@@ -380,8 +380,8 @@ export function SharingDialog({ workflowId, onClose }: SharingDialogProps) {
                     onClick={() => handleUnshare(share.userId)}
                     style={{
                       padding: 'var(--spacing-xs) var(--spacing-sm)',
-                      background: '#fee2e2',
-                      color: '#991b1b',
+                      background: 'var(--color-danger-bg)',
+                      color: 'var(--color-danger-text)',
                       border: 'none',
                       borderRadius: 'var(--radius-sm)',
                       fontSize: '0.75rem',

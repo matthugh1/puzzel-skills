@@ -138,8 +138,8 @@ export default function InboxPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -162,7 +162,7 @@ export default function InboxPage() {
             style={{
               padding: 'var(--spacing-sm) var(--spacing-md)',
               background: activeTab === 'tasks' ? 'var(--color-primary)' : 'transparent',
-              color: activeTab === 'tasks' ? 'white' : 'var(--color-text)',
+              color: activeTab === 'tasks' ? 'var(--color-on-primary)' : 'var(--color-text)',
               border: 'none',
               borderBottom: activeTab === 'tasks' ? '2px solid var(--color-primary)' : '2px solid transparent',
               borderRadius: 'var(--radius-sm) var(--radius-sm) 0 0',
@@ -179,7 +179,7 @@ export default function InboxPage() {
             style={{
               padding: 'var(--spacing-sm) var(--spacing-md)',
               background: activeTab === 'data-inputs' ? 'var(--color-primary)' : 'transparent',
-              color: activeTab === 'data-inputs' ? 'white' : 'var(--color-text)',
+              color: activeTab === 'data-inputs' ? 'var(--color-on-primary)' : 'var(--color-text)',
               border: 'none',
               borderBottom: activeTab === 'data-inputs' ? '2px solid var(--color-primary)' : '2px solid transparent',
               borderRadius: 'var(--radius-sm) var(--radius-sm) 0 0',
@@ -288,7 +288,7 @@ export default function InboxPage() {
                       style={{
                         padding: 'var(--spacing-sm) var(--spacing-lg)',
                         background: 'var(--color-primary)',
-                        color: 'white',
+                        color: 'var(--color-on-primary)',
                         border: 'none',
                         borderRadius: 'var(--radius-md)',
                         fontSize: '0.875rem',
@@ -509,7 +509,7 @@ function DataInputForm({
           style={{
             padding: 'var(--spacing-sm) var(--spacing-lg)',
             background: 'var(--color-primary)',
-            color: 'white',
+            color: 'var(--color-on-primary)',
             border: 'none',
             borderRadius: 'var(--radius-md)',
             fontSize: '0.875rem',

@@ -80,7 +80,7 @@ export default function SkillsPage() {
         >
           <h1
             style={{
-              fontSize: '2.25rem',
+              fontSize: '2rem',
               fontWeight: 700,
               margin: 0,
               fontFamily: 'var(--font-display)',
@@ -89,7 +89,7 @@ export default function SkillsPage() {
           >
             Skills Browser
           </h1>
-          <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
+          <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
             {skills.length} {skills.length === 1 ? 'skill' : 'skills'}
           </div>
         </div>
@@ -128,8 +128,8 @@ export default function SkillsPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}

@@ -22,23 +22,17 @@ export function CategoryFilter({
       >
         <button
           onClick={() => onSelectCategory(null)}
+          className="btn btn-pill"
           style={{
-            padding: 'var(--spacing-sm) var(--spacing-md)',
             background:
               selectedCategory === null
                 ? 'var(--color-primary)'
                 : 'var(--color-surface-secondary)',
             color:
               selectedCategory === null
-                ? 'white'
+                ? 'var(--color-on-primary)'
                 : 'var(--color-text)',
             border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            fontSize: '0.875rem',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            fontFamily: 'var(--font-body)',
           }}
           onMouseEnter={(e) => {
             if (selectedCategory !== null) {
@@ -57,23 +51,17 @@ export function CategoryFilter({
           <button
             key={category}
             onClick={() => onSelectCategory(category)}
+            className="btn btn-pill"
             style={{
-              padding: 'var(--spacing-sm) var(--spacing-md)',
               background:
                 selectedCategory === category
                   ? 'var(--color-primary)'
                   : 'var(--color-surface-secondary)',
               color:
                 selectedCategory === category
-                  ? 'white'
+                  ? 'var(--color-on-primary)'
                   : 'var(--color-text)',
               border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              fontFamily: 'var(--font-body)',
             }}
             onMouseEnter={(e) => {
               if (selectedCategory !== category) {

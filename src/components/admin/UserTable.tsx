@@ -184,7 +184,7 @@ export function UserTable({ users, onEdit }: UserTableProps) {
                       style={{
                         padding: 'var(--spacing-xs) var(--spacing-md)',
                         background: 'var(--color-primary)',
-                        color: 'white',
+                        color: 'var(--color-on-primary)',
                         border: 'none',
                         borderRadius: 'var(--radius-md)',
                         fontSize: '0.875rem',
@@ -201,7 +201,7 @@ export function UserTable({ users, onEdit }: UserTableProps) {
                       style={{
                         padding: 'var(--spacing-xs) var(--spacing-md)',
                         background: 'var(--color-primary)',
-                        color: 'white',
+                        color: 'var(--color-on-primary)',
                         border: 'none',
                         borderRadius: 'var(--radius-md)',
                         fontSize: '0.875rem',

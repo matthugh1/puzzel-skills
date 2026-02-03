@@ -53,43 +53,51 @@ export default function LoginPage() {
       <main className="page-content">
         <div
           style={{
-            maxWidth: '400px',
+            maxWidth: '420px',
             margin: '0 auto',
             paddingTop: 'var(--spacing-2xl)',
           }}
         >
-          <h1
+          <div
             style={{
-              fontSize: '2.25rem',
-              fontWeight: 700,
-              marginBottom: 'var(--spacing-md)',
-              fontFamily: 'var(--font-display)',
-              color: 'var(--color-text)',
-              textAlign: 'center',
+              border: '1px solid var(--color-border-muted)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--spacing-xl)',
+              background: 'var(--color-surface)',
             }}
           >
-            Sign In
-          </h1>
+            <h1
+              style={{
+                fontSize: '2rem',
+                fontWeight: 700,
+                marginBottom: 'var(--spacing-md)',
+                fontFamily: 'var(--font-display)',
+                color: 'var(--color-text)',
+                textAlign: 'center',
+              }}
+            >
+              Sign In
+            </h1>
 
-          <p
-            style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-text-secondary)',
-              textAlign: 'center',
-              marginBottom: 'var(--spacing-xl)',
-              fontFamily: 'var(--font-body)',
-            }}
-          >
-            Sign in to access your skills and manage the library
-          </p>
+            <p
+              style={{
+                fontSize: '0.875rem',
+                color: 'var(--color-text-secondary)',
+                textAlign: 'center',
+                marginBottom: 'var(--spacing-xl)',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              Sign in to access your skills and manage the library
+            </p>
 
-          <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
             {error && (
               <div
                 style={{
                   padding: 'var(--spacing-md)',
-                  background: '#fee2e2',
-                  color: '#991b1b',
+                  background: 'var(--color-danger-bg)',
+                  color: 'var(--color-danger-text)',
                   borderRadius: 'var(--radius-md)',
                   marginBottom: 'var(--spacing-lg)',
                   fontSize: '0.875rem',
@@ -121,24 +129,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: 'var(--spacing-sm) var(--spacing-md)',
-                  fontSize: '1rem',
-                  background: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  color: 'var(--color-text)',
-                  fontFamily: 'var(--font-body)',
-                  boxSizing: 'border-box',
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--color-primary)';
-                  e.target.style.outline = 'none';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--color-border)';
-                }}
+                className="input"
               />
             </div>
 
@@ -163,42 +154,20 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: 'var(--spacing-sm) var(--spacing-md)',
-                  fontSize: '1rem',
-                  background: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  color: 'var(--color-text)',
-                  fontFamily: 'var(--font-body)',
-                  boxSizing: 'border-box',
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--color-primary)';
-                  e.target.style.outline = 'none';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--color-border)';
-                }}
+                className="input"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
+              className="btn btn-primary"
               style={{
                 width: '100%',
-                padding: 'var(--spacing-md)',
-                fontSize: '0.875rem',
-                fontWeight: 500,
                 background: loading ? 'var(--color-text-muted)' : 'var(--color-primary)',
-                color: 'white',
-                border: 'none',
-                borderRadius: 'var(--radius-md)',
+                color: 'var(--color-on-primary)',
+                border: '1px solid var(--color-primary)',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                fontFamily: 'var(--font-body)',
-                transition: 'background 0.2s ease',
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
@@ -229,6 +198,7 @@ export default function LoginPage() {
             <strong>Default credentials:</strong>
             <br />
             Admin: admin@puzzel.com / admin123
+          </div>
           </div>
         </div>
       </main>

@@ -45,14 +45,14 @@ export function VersionDiff({
     switch (type) {
       case 'added':
         return {
-          background: '#d1fae5',
-          color: '#065f46',
+          background: 'var(--color-success-bg)',
+          color: 'var(--color-success-text)',
           borderLeft: '3px solid var(--color-success)',
         };
       case 'removed':
         return {
-          background: '#fee2e2',
-          color: '#991b1b',
+          background: 'var(--color-danger-bg)',
+          color: 'var(--color-danger-text)',
           borderLeft: '3px solid var(--color-danger)',
         };
       default:
@@ -157,7 +157,7 @@ export function VersionDiff({
             style={{
               width: '12px',
               height: '12px',
-              background: '#fee2e2',
+              background: 'var(--color-danger-bg)',
               border: '1px solid var(--color-danger)',
             }}
           />
@@ -168,7 +168,7 @@ export function VersionDiff({
             style={{
               width: '12px',
               height: '12px',
-              background: '#d1fae5',
+              background: 'var(--color-success-bg)',
               border: '1px solid var(--color-success)',
             }}
           />

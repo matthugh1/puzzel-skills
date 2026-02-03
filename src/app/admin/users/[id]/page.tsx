@@ -122,8 +122,8 @@ export default function EditUserPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
             }}
           >
@@ -155,8 +155,8 @@ export default function EditUserPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -335,7 +335,7 @@ export default function EditUserPage() {
                 style={{
                   padding: 'var(--spacing-sm) var(--spacing-lg)',
                   background: saving ? 'var(--color-surface-secondary)' : 'var(--color-primary)',
-                  color: saving ? 'var(--color-text-muted)' : 'white',
+                  color: saving ? 'var(--color-text-muted)' : 'var(--color-on-primary)',
                   border: 'none',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '0.875rem',

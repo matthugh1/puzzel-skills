@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { validatePasswordStrength } from '../src/lib/password';
 
 const prisma = new PrismaClient();
 
@@ -10,6 +11,19 @@ async function hashPassword(password: string): Promise<string> {
 
 async function main() {
   console.log('🌱 Seeding database...');
+
+  const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@puzzel.com';
+  const adminName = process.env.ADMIN_NAME ?? 'Admin';
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminPassword) {
+    throw new Error('ADMIN_PASSWORD is required to seed the admin user.');
+  }
+
+  const passwordValidation = validatePasswordStrength(adminPassword);
+  if (!passwordValidation.valid) {
+    throw new Error(`ADMIN_PASSWORD does not meet requirements: ${passwordValidation.errors.join(' ')}`);
+  }
 
   // ============================================================================
   // PERMISSIONS
@@ -173,13 +187,16 @@ async function main() {
   console.log('Creating default admin user...');
 
   const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@puzzel.com' },
-    update: {},
+    where: { email: adminEmail },
+    update: {
+      name: adminName,
+      passwordHash: await hashPassword(adminPassword),
+    },
     create: {
-      email: 'admin@puzzel.com',
-      name: 'Admin User',
+      email: adminEmail,
+      name: adminName,
       authProvider: 'LOCAL',
-      passwordHash: await hashPassword('admin123'), // Change this in production!
+      passwordHash: await hashPassword(adminPassword),
     },
   });
 
@@ -311,11 +328,7 @@ Provide analysis with score (0-100), findings, violations, and recommendations.`
 
   console.log('✅ Seed completed successfully!');
   console.log('');
-  console.log('Default admin credentials:');
-  console.log('  Email: admin@puzzel.com');
-  console.log('  Password: admin123');
-  console.log('');
-  console.log('⚠️  Change the admin password in production!');
+  console.log('Default admin user updated.');
 }
 
 main()

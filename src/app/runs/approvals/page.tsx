@@ -133,8 +133,8 @@ export default function ApprovalsPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -287,8 +287,8 @@ export default function ApprovalsPage() {
                       disabled={rejecting === run.id}
                       style={{
                         padding: 'var(--spacing-sm) var(--spacing-md)',
-                        background: '#fee2e2',
-                        color: '#991b1b',
+                        background: 'var(--color-danger-bg)',
+                        color: 'var(--color-danger-text)',
                         border: 'none',
                         borderRadius: 'var(--radius-md)',
                         fontSize: '0.875rem',
@@ -306,7 +306,7 @@ export default function ApprovalsPage() {
                       style={{
                         padding: 'var(--spacing-sm) var(--spacing-md)',
                         background: 'var(--color-primary)',
-                        color: 'white',
+                        color: 'var(--color-on-primary)',
                         border: 'none',
                         borderRadius: 'var(--radius-md)',
                         fontSize: '0.875rem',

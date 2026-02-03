@@ -80,9 +80,9 @@ export default function WorkflowsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'PUBLISHED':
-        return { bg: '#d1fae5', text: '#065f46' };
+        return { bg: 'var(--color-success-bg)', text: 'var(--color-success-text)' };
       case 'DRAFT':
-        return { bg: '#e9d5ff', text: '#6b21a8' };
+        return { bg: 'var(--color-accent-bg)', text: 'var(--color-accent-text)' };
       case 'ARCHIVED':
         return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-secondary)' };
       default:
@@ -121,7 +121,7 @@ export default function WorkflowsPage() {
             style={{
               padding: 'var(--spacing-sm) var(--spacing-lg)',
               background: 'var(--color-primary)',
-              color: 'white',
+              color: 'var(--color-on-primary)',
               border: 'none',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
@@ -180,8 +180,8 @@ export default function WorkflowsPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -206,7 +206,7 @@ export default function WorkflowsPage() {
               style={{
                 padding: 'var(--spacing-sm) var(--spacing-lg)',
                 background: 'var(--color-primary)',
-                color: 'white',
+                color: 'var(--color-on-primary)',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
                 fontSize: '0.875rem',

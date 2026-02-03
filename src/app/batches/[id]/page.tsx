@@ -81,15 +81,15 @@ export default function BatchDetailPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'COMPLETE':
-        return { bg: '#d1fae5', text: '#065f46' };
+        return { bg: 'var(--color-success-bg)', text: 'var(--color-success-text)' };
       case 'RUNNING':
-        return { bg: '#dbeafe', text: '#1e40af' };
+        return { bg: 'var(--color-info-bg)', text: 'var(--color-info-text)' };
       case 'FAILED':
-        return { bg: '#fee2e2', text: '#991b1b' };
+        return { bg: 'var(--color-danger-bg)', text: 'var(--color-danger-text)' };
       case 'CANCELLED':
-        return { bg: '#f3f4f6', text: '#6b7280' };
+        return { bg: 'var(--color-neutral-bg)', text: 'var(--color-neutral-text)' };
       case 'PENDING':
-        return { bg: '#fef3c7', text: '#92400e' };
+        return { bg: 'var(--color-warning-bg)', text: 'var(--color-warning-text)' };
       default:
         return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-secondary)' };
     }
@@ -98,16 +98,16 @@ export default function BatchDetailPage() {
   const getRunStatusColor = (status: string) => {
     switch (status) {
       case 'COMPLETE':
-        return { bg: '#d1fae5', text: '#065f46' };
+        return { bg: 'var(--color-success-bg)', text: 'var(--color-success-text)' };
       case 'RUNNING':
       case 'PLANNING':
-        return { bg: '#dbeafe', text: '#1e40af' };
+        return { bg: 'var(--color-info-bg)', text: 'var(--color-info-text)' };
       case 'FAILED':
-        return { bg: '#fee2e2', text: '#991b1b' };
+        return { bg: 'var(--color-danger-bg)', text: 'var(--color-danger-text)' };
       case 'CANCELLED':
-        return { bg: '#f3f4f6', text: '#6b7280' };
+        return { bg: 'var(--color-neutral-bg)', text: 'var(--color-neutral-text)' };
       case 'BLOCKED':
-        return { bg: '#fef3c7', text: '#92400e' };
+        return { bg: 'var(--color-warning-bg)', text: 'var(--color-warning-text)' };
       default:
         return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-secondary)' };
     }
@@ -150,8 +150,8 @@ export default function BatchDetailPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
             }}
           >
@@ -297,13 +297,13 @@ export default function BatchDetailPage() {
               </div>
               <div>
                 <strong style={{ color: 'var(--color-text-secondary)' }}>Completed:</strong>
-                <div style={{ color: '#065f46', fontSize: '1.25rem', fontWeight: 600 }}>
+                <div style={{ color: 'var(--color-success-text)', fontSize: '1.25rem', fontWeight: 600 }}>
                   {batch.completedItems}
                 </div>
               </div>
               <div>
                 <strong style={{ color: 'var(--color-text-secondary)' }}>Failed:</strong>
-                <div style={{ color: '#991b1b', fontSize: '1.25rem', fontWeight: 600 }}>
+                <div style={{ color: 'var(--color-danger-text)', fontSize: '1.25rem', fontWeight: 600 }}>
                   {batch.failedItems}
                 </div>
               </div>
@@ -334,7 +334,7 @@ export default function BatchDetailPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'white',
+                  color: 'var(--color-on-primary)',
                   fontSize: '0.75rem',
                   fontWeight: 500,
                 }}

@@ -75,17 +75,17 @@ export default function RunDetailPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'COMPLETE':
-        return { bg: '#d1fae5', text: '#065f46' };
+        return { bg: 'var(--color-success-bg)', text: 'var(--color-success-text)' };
       case 'RUNNING':
-        return { bg: '#dbeafe', text: '#1e40af' };
+        return { bg: 'var(--color-info-bg)', text: 'var(--color-info-text)' };
       case 'BLOCKED':
-        return { bg: '#fef3c7', text: '#92400e' };
+        return { bg: 'var(--color-warning-bg)', text: 'var(--color-warning-text)' };
       case 'FAILED':
-        return { bg: '#fee2e2', text: '#991b1b' };
+        return { bg: 'var(--color-danger-bg)', text: 'var(--color-danger-text)' };
       case 'CANCELLED':
         return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-secondary)' };
       case 'PLANNING':
-        return { bg: '#e9d5ff', text: '#6b21a8' };
+        return { bg: 'var(--color-accent-bg)', text: 'var(--color-accent-text)' };
       default:
         return { bg: 'var(--color-surface-secondary)', text: 'var(--color-text-secondary)' };
     }
@@ -123,8 +123,8 @@ export default function RunDetailPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
             }}
           >
@@ -357,8 +357,8 @@ export default function RunDetailPage() {
                         <div
                           style={{
                             padding: 'var(--spacing-sm)',
-                            background: '#fee2e2',
-                            color: '#991b1b',
+                            background: 'var(--color-danger-bg)',
+                            color: 'var(--color-danger-text)',
                             borderRadius: 'var(--radius-sm)',
                             marginTop: 'var(--spacing-sm)',
                             fontSize: '0.875rem',

@@ -36,20 +36,20 @@ export function SkillCard({
           background: 'var(--color-surface)',
           border: '1px solid var(--color-border)',
           borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-md)',
+          boxShadow: 'var(--shadow-sm)',
           padding: 'var(--spacing-lg)',
           cursor: 'pointer',
-          transition: 'all 0.2s ease',
+          transition: 'all 0.15s ease',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+          e.currentTarget.style.transform = 'translateY(-1px)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
           e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
@@ -65,7 +65,7 @@ export function SkillCard({
             <h3
               style={{
                 margin: 0,
-                fontSize: '1.25rem',
+                fontSize: '1.125rem',
                 fontWeight: 600,
                 color: 'var(--color-text)',
                 fontFamily: 'var(--font-display)',
@@ -79,8 +79,8 @@ export function SkillCard({
                   background: 'var(--color-surface-secondary)',
                   color: 'var(--color-text-secondary)',
                   padding: 'var(--spacing-xs) var(--spacing-sm)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.875rem',
+                  borderRadius: '999px',
+                  fontSize: '0.75rem',
                   fontWeight: 500,
                 }}
               >
@@ -94,7 +94,7 @@ export function SkillCard({
               style={{
                 color: 'var(--color-text-secondary)',
                 fontSize: '0.875rem',
-                lineHeight: 1.6,
+                lineHeight: 1.5,
                 marginBottom: 'var(--spacing-md)',
                 display: '-webkit-box',
                 WebkitLineClamp: 3,
@@ -122,7 +122,7 @@ export function SkillCard({
                     background: 'var(--color-surface-tertiary)',
                     color: 'var(--color-text-secondary)',
                     padding: '2px var(--spacing-sm)',
-                    borderRadius: 'var(--radius-sm)',
+                    borderRadius: '999px',
                     fontSize: '0.75rem',
                   }}
                 >

@@ -65,7 +65,7 @@ export default function ToolsPage() {
             style={{
               padding: 'var(--spacing-sm) var(--spacing-lg)',
               background: 'var(--color-primary)',
-              color: 'white',
+              color: 'var(--color-on-primary)',
               borderRadius: 'var(--radius-md)',
               fontSize: '0.875rem',
               fontWeight: 500,
@@ -93,8 +93,8 @@ export default function ToolsPage() {
           <div
             style={{
               padding: 'var(--spacing-lg)',
-              background: '#fee2e2',
-              color: '#991b1b',
+              background: 'var(--color-danger-bg)',
+              color: 'var(--color-danger-text)',
               borderRadius: 'var(--radius-md)',
               marginBottom: 'var(--spacing-lg)',
             }}
@@ -210,8 +210,8 @@ export default function ToolsPage() {
                               <span
                                 style={{
                                   padding: '2px 6px',
-                                  background: '#fee2e2',
-                                  color: '#991b1b',
+                                  background: 'var(--color-danger-bg)',
+                                  color: 'var(--color-danger-text)',
                                   borderRadius: 'var(--radius-sm)',
                                   fontSize: '0.75rem',
                                   fontWeight: 500,

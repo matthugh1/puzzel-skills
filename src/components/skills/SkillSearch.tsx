@@ -20,26 +20,10 @@ export function SkillSearch({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        className="input"
         style={{
-          width: '100%',
           padding: 'var(--spacing-md) var(--spacing-lg)',
           paddingLeft: '2.75rem',
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-md)',
-          fontSize: '1rem',
-          color: 'var(--color-text)',
-          fontFamily: 'var(--font-body)',
-          transition: 'all 0.2s ease',
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.borderColor = 'var(--color-primary)';
-          e.currentTarget.style.outline = 'none';
-          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)';
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.borderColor = 'var(--color-border)';
-          e.currentTarget.style.boxShadow = 'none';
         }}
       />
       <svg

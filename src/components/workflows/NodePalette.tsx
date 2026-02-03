@@ -22,14 +22,14 @@ const nodeTypes: Array<{
   icon: string;
   color: string;
 }> = [
-  { type: 'SKILL', label: 'Skill', icon: '⚡', color: '#6366f1' },
-  { type: 'BRANCH', label: 'Branch', icon: '🔀', color: '#f59e0b' },
-  { type: 'MERGE', label: 'Merge', icon: '🔗', color: '#3b82f6' },
-  { type: 'ITERATOR', label: 'Iterator', icon: '🔁', color: '#ec4899' },
-  { type: 'WAIT', label: 'Wait', icon: '⏸️', color: '#f59e0b' },
-  { type: 'APP_ACTION', label: 'App Action', icon: '🔌', color: '#22c55e' },
-  { type: 'TASK', label: 'Task', icon: '📋', color: '#f59e0b' },
-  { type: 'DATA_INPUT', label: 'Data Input', icon: '📝', color: '#6366f1' },
+  { type: 'SKILL', label: 'Skill', icon: '⚡', color: 'var(--color-primary)' },
+  { type: 'BRANCH', label: 'Branch', icon: '🔀', color: 'var(--color-warning)' },
+  { type: 'MERGE', label: 'Merge', icon: '🔗', color: 'var(--color-info-text)' },
+  { type: 'ITERATOR', label: 'Iterator', icon: '🔁', color: 'var(--color-primary)' },
+  { type: 'WAIT', label: 'Wait', icon: '⏸️', color: 'var(--color-warning)' },
+  { type: 'APP_ACTION', label: 'App Action', icon: '🔌', color: 'var(--color-success)' },
+  { type: 'TASK', label: 'Task', icon: '📋', color: 'var(--color-warning)' },
+  { type: 'DATA_INPUT', label: 'Data Input', icon: '📝', color: 'var(--color-primary)' },
 ];
 
 export function NodePalette({ onAddNode }: NodePaletteProps) {
@@ -82,7 +82,7 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
               alignItems: 'center',
               gap: 'var(--spacing-sm)',
               padding: 'var(--spacing-sm) var(--spacing-md)',
-              background: 'white',
+              background: 'var(--color-surface)',
               border: `1px solid var(--color-border)`,
               borderRadius: 'var(--radius-md)',
               cursor: 'pointer',
@@ -92,11 +92,11 @@ export function NodePalette({ onAddNode }: NodePaletteProps) {
               transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#f9fafb';
+              e.currentTarget.style.background = 'var(--color-surface-secondary)';
               e.currentTarget.style.borderColor = nodeType.color;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'white';
+              e.currentTarget.style.background = 'var(--color-surface)';
               e.currentTarget.style.borderColor = 'var(--color-border)';
             }}
           >
