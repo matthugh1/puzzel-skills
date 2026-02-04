@@ -338,13 +338,63 @@ export async function extractPDFText(filePath?: string, buffer?: Buffer): Promis
     console.error(`[FileStorage] Attempting PDF text extraction (size: ${buffer.length} bytes)`);
     
     // Use pdf-parse v1.x which works reliably with buffers
-    // Simple default import approach (same as compliance-analyzer)
+    // NOTE: pdf-parse has a known bug where it tries to access './test/data/05-versions-space.pdf'
+    // during execution. We'll catch this specific error and work around it.
     try {
       // Import pdf-parse v1.x - use default import (works with v1.x)
       const pdfParse = require('pdf-parse');
       
-      console.error(`[FileStorage] Using pdf-parse v1.x API with buffer...`);
-      const pdfData = await pdfParse(buffer);
+      console.error(`[FileStorage] Using pdf-parse v1.x API with buffer (size: ${buffer.length} bytes)...`);
+      
+      // Ensure buffer is actually a Buffer instance
+      const pdfBuffer = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
+      
+      // Call pdfParse with buffer directly
+      // pdf-parse should accept Buffer as first argument
+      let pdfData;
+      try {
+        pdfData = await pdfParse(pdfBuffer);
+      } catch (parseError) {
+        const errorMsg = parseError instanceof Error ? parseError.message : String(parseError);
+        
+        // Handle known pdf-parse bug: tries to access test file './test/data/05-versions-space.pdf'
+        // This is a bug in pdf-parse where it has debug code that runs during execution
+        // The test file should exist at ./test/data/05-versions-space.pdf (copied from node_modules)
+        if (errorMsg.includes('test/data') || errorMsg.includes('05-versions-space.pdf')) {
+          console.error(`[FileStorage] pdf-parse test file error detected (known bug in pdf-parse library)`);
+          console.error(`[FileStorage] This is a bug in pdf-parse - it tries to access a test file during execution`);
+          console.error(`[FileStorage] Retrying parse (the error is from debug code, not the actual parsing)...`);
+          
+          // Retry the parse - the error is from debug code, not the actual parsing
+          // The parse should succeed on retry if the test file exists
+          try {
+            pdfData = await pdfParse(pdfBuffer);
+            console.error(`[FileStorage] Retry succeeded after test file error`);
+          } catch (retryError) {
+            const retryErrorMsg = retryError instanceof Error ? retryError.message : String(retryError);
+            
+            // If retry also fails with the same test file error, the test file might be missing
+            if (retryErrorMsg.includes('test/data') || retryErrorMsg.includes('05-versions-space.pdf')) {
+              console.error(`[FileStorage] Test file error persists - checking if test file exists...`);
+              const testFilePath = join(process.cwd(), 'test', 'data', '05-versions-space.pdf');
+              if (!existsSync(testFilePath)) {
+                console.error(`[FileStorage] Test file missing at ${testFilePath}`);
+                console.error(`[FileStorage] Workaround: Copy node_modules/pdf-parse/test/data/05-versions-space.pdf to test/data/`);
+              }
+              
+              // Try one more time - sometimes it works despite the error
+              pdfData = await pdfParse(pdfBuffer);
+            } else {
+              // If it's a different error, throw that
+              throw retryError;
+            }
+          }
+        } else {
+          // Re-throw if it's a different error
+          throw parseError;
+        }
+      }
+      
       console.error(`[FileStorage] pdf-parse completed. Pages: ${pdfData.numpages || 'unknown'}, Text length: ${pdfData.text?.length || 0}`);
       
       const extractedText = pdfData.text || '';
@@ -359,6 +409,20 @@ export async function extractPDFText(filePath?: string, buffer?: Buffer): Promis
     } catch (pdfError) {
       // Re-throw with context
       const errorMsg = pdfError instanceof Error ? pdfError.message : String(pdfError);
+      const errorStack = pdfError instanceof Error ? pdfError.stack : undefined;
+      
+      console.error(`[FileStorage] pdf-parse error details:`, {
+        error: errorMsg,
+        stack: errorStack,
+        bufferSize: buffer.length,
+        filePath,
+      });
+      
+      // Check if it's the test file error - this suggests a bug in pdf-parse
+      if (errorMsg.includes('test/data') || errorMsg.includes('05-versions-space.pdf')) {
+        throw new Error(`PDF extraction failed due to internal library issue. The PDF file appears to be valid (${buffer.length} bytes), but pdf-parse encountered an error. Please try a different PDF file or contact support.`);
+      }
+      
       throw new Error(`Failed to extract text from PDF: ${errorMsg}`);
     }
   } catch (pdfError) {
@@ -392,12 +456,40 @@ export async function extractPDFText(filePath?: string, buffer?: Buffer): Promis
 export async function loadFile(ref: string): Promise<string> {
   const filePath = getFilePathFromReference(ref);
   
-  // If it's a relative path (runId/filename), resolve it
-  const fullPath = filePath.includes('/')
-    ? join(TEMP_BASE_DIR, filePath)
-    : join(TEMP_BASE_DIR, filePath);
+  // Always resolve relative to TEMP_BASE_DIR (filePath is runId/filename with forward slashes)
+  // Use the same approach as loadFileBuffer for consistency
+  const fullPath = join(TEMP_BASE_DIR, ...filePath.split('/'));
+  
+  console.error(`[FileStorage] loadFile:`, {
+    ref,
+    filePath,
+    fullPath,
+    tempBaseDir: TEMP_BASE_DIR,
+    exists: existsSync(fullPath),
+  });
   
   if (!existsSync(fullPath)) {
+    // List directory contents for debugging
+    const runId = filePath.split('/')[0];
+    const runDir = join(TEMP_BASE_DIR, runId);
+    const dirExists = existsSync(runDir);
+    let dirContents: string[] = [];
+    if (dirExists) {
+      try {
+        const { readdirSync } = await import('fs');
+        dirContents = readdirSync(runDir);
+      } catch (e) {
+        // Ignore readdir errors
+      }
+    }
+    
+    console.error(`[FileStorage] File not found. Debug info:`, {
+      fullPath,
+      runDir,
+      runDirExists: dirExists,
+      dirContents,
+    });
+    
     throw new Error(`File not found: ${fullPath}`);
   }
   

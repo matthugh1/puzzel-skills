@@ -9,6 +9,8 @@ import {
 } from '@/lib/permissions';
 import { audit } from '@/lib/audit';
 import { validateCSRFToken } from '@/lib/csrf';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { validateRequestBody, validationSchemas, ValidationError } from '@/lib/validation';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -102,6 +104,12 @@ export async function PUT(request: NextRequest, context: RouteContext) {
   const { user } = authResult;
   const { id } = await context.params;
 
+  // Rate limiting
+  const rateLimitResponse = rateLimit(request, RATE_LIMITS.API, user.id);
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   const skill = await db.skill.findUnique({
     where: { id },
   });
@@ -122,15 +130,17 @@ export async function PUT(request: NextRequest, context: RouteContext) {
   }
 
   try {
-    const body = await request.json();
-    console.log(`[API Skills] PUT /api/skills/${id} - Request body:`, JSON.stringify(body, null, 2));
-    const { name, description, category, tags, toolId, visibility } = body;
-    console.log(`[API Skills] Extracted fields:`, {
+    const body = await validateRequestBody(request, validationSchemas.updateSkill);
+    const {
+      name,
+      description,
+      category,
+      tags,
       toolId,
-      toolIdType: typeof toolId,
-      toolIdInBody: 'toolId' in body,
       visibility,
-    });
+      inputContract,
+      outputContract,
+    } = body;
 
     // Get old values for audit
     const oldValues = {
@@ -168,70 +178,59 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     const toolIdProvided = 'toolId' in body;
     const toolIdValue = toolId && typeof toolId === 'string' ? toolId.trim() : null;
     const hasToolId = toolIdValue && toolIdValue.length > 0;
-    
-    console.log(`[API Skills] toolId update check:`, {
-      toolIdProvided,
-      toolId,
-      toolIdValue,
-      hasToolId,
-      hasLatestVersion: !!latestVersion,
-    });
-    
-    if (toolIdProvided && latestVersion) {
-      console.log(`[API Skills] Updating toolId for skill ${id}, version ${latestVersion.id}:`, {
-        toolId,
-        toolIdValue,
-        toolIdType: typeof toolId,
-        hasToolId,
-        hasMetadata: !!latestVersion.metadata,
-        currentExecutorConfig: latestVersion.metadata?.executorConfig,
-      });
-      
-      if (hasToolId && latestVersion.metadata) {
-        // Update existing metadata - merge with existing executorConfig
-        const currentConfig = (latestVersion.metadata.executorConfig as Record<string, unknown>) || {};
-        const updatedConfig = {
-          ...currentConfig,
-          toolId: toolIdValue,
-        };
-        const result = await db.skillVersionMetadata.update({
+    const inputContractProvided = 'inputContract' in body;
+    const outputContractProvided = 'outputContract' in body;
+    const inputContractValue = inputContract ?? null;
+    const outputContractValue = outputContract ?? null;
+
+    if (latestVersion) {
+      const metadataUpdates: Record<string, unknown> = {};
+
+      if (toolIdProvided) {
+        if (hasToolId) {
+          const currentConfig = (latestVersion.metadata?.executorConfig as Record<string, unknown>) || {};
+          metadataUpdates.executorConfig = {
+            ...currentConfig,
+            toolId: toolIdValue,
+          };
+        } else if (latestVersion.metadata) {
+          const currentConfig = (latestVersion.metadata.executorConfig as Record<string, unknown>) || {};
+          const { toolId: _, ...restConfig } = currentConfig;
+          metadataUpdates.executorConfig = Object.keys(restConfig).length > 0 ? restConfig : null;
+        }
+      }
+
+      if (inputContractProvided) {
+        metadataUpdates.inputContract = inputContractValue;
+      }
+
+      if (outputContractProvided) {
+        metadataUpdates.outputContract = outputContractValue;
+      }
+
+      const hasUpdate = Object.keys(metadataUpdates).length > 0;
+      const shouldCreateMetadata = !latestVersion.metadata && (
+        hasToolId ||
+        (inputContractProvided && inputContractValue !== null) ||
+        (outputContractProvided && outputContractValue !== null)
+      );
+
+      if (latestVersion.metadata && hasUpdate) {
+        await db.skillVersionMetadata.update({
           where: { skillVersionId: latestVersion.id },
-          data: {
-            executorConfig: updatedConfig,
-          },
+          data: metadataUpdates,
         });
-        console.log(`[API Skills] ✅ Updated executorConfig with toolId. Result:`, result.executorConfig);
-      } else if (hasToolId && !latestVersion.metadata) {
-        // Create new metadata
-        const newConfig = {
-          toolId: toolIdValue,
-        };
-        const result = await db.skillVersionMetadata.create({
+      } else if (shouldCreateMetadata) {
+        await db.skillVersionMetadata.create({
           data: {
             skillVersionId: latestVersion.id,
-            executorConfig: newConfig,
+            capabilities: [],
+            executorConfig: hasToolId ? { toolId: toolIdValue } : undefined,
+            inputContract: inputContractValue ?? undefined,
+            outputContract: outputContractValue ?? undefined,
           },
         });
-        console.log(`[API Skills] ✅ Created new metadata with toolId. Result:`, result.executorConfig);
-      } else if (!hasToolId && latestVersion.metadata) {
-        // Remove toolId from metadata (toolId is null or empty)
-        const currentConfig = (latestVersion.metadata.executorConfig as Record<string, unknown>) || {};
-        const { toolId: _, ...restConfig } = currentConfig;
-        const updatedConfig = Object.keys(restConfig).length > 0 ? restConfig : null;
-        const result = await db.skillVersionMetadata.update({
-          where: { skillVersionId: latestVersion.id },
-          data: {
-            executorConfig: updatedConfig,
-          },
-        });
-        console.log(`[API Skills] ✅ Removed toolId from executorConfig. Result:`, result.executorConfig);
-      } else if (!hasToolId && !latestVersion.metadata) {
-        console.log(`[API Skills] No toolId provided and no metadata exists - nothing to update`);
       }
-    } else if (!toolIdProvided) {
-      console.log(`[API Skills] toolId not provided in request body - skipping metadata update`);
-    } else if (!latestVersion) {
-      console.log(`[API Skills] ⚠️ No latest version found for skill ${id} - cannot update toolId`);
     }
 
     // Reload skill with updated metadata to return complete data
@@ -251,18 +250,6 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       },
     });
 
-    // Log the final state to verify toolId was saved
-    if (skillWithMetadata?.versions[0]?.metadata) {
-      console.log(`[API Skills] ✅ Final skill metadata:`, {
-        skillId: id,
-        versionId: skillWithMetadata.versions[0].id,
-        executorConfig: skillWithMetadata.versions[0].metadata.executorConfig,
-        toolId: (skillWithMetadata.versions[0].metadata.executorConfig as Record<string, unknown>)?.toolId,
-      });
-    } else {
-      console.log(`[API Skills] ⚠️ No metadata found in response for skill ${id}`);
-    }
-
     // Log audit with old and new values
     await audit.skillUpdated(id, user.id, {
       oldValues,
@@ -276,17 +263,16 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json({ skill: skillWithMetadata || updatedSkill });
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return NextResponse.json(
+        { error: 'Invalid request data', details: error.errors },
+        { status: 400 }
+      );
+    }
+
     console.error('[API Skills] Update skill error:', error);
-    console.error('[API Skills] Error details:', {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : undefined,
-    });
     return NextResponse.json(
-      { 
-        error: 'Failed to update skill',
-        details: error instanceof Error ? error.message : String(error),
-      },
+      { error: 'Failed to update skill' },
       { status: 500 }
     );
   }

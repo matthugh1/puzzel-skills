@@ -1,36 +1,25 @@
-/**
- * GET /api/tools
- * List all available reusable tools
- */
-
-import { NextRequest, NextResponse } from 'next/server';
-import { checkAuthWithPermission } from '@/lib/permissions';
-import { PERMISSIONS } from '@/lib/permissions';
+import { NextResponse } from 'next/server';
 import { toolsRegistry } from '@/lib/tools';
 
-export async function GET(request: NextRequest) {
+/**
+ * GET /api/tools
+ * List all available tools
+ * Public endpoint (tools are public knowledge)
+ */
+export async function GET() {
   try {
-    const authResult = await checkAuthWithPermission(request, PERMISSIONS.SKILLS_READ);
+    const tools = toolsRegistry.getAll().map((tool) => ({
+      id: tool.id,
+      name: tool.name,
+      description: tool.description,
+      inputSchema: tool.inputSchema,
+    }));
 
-    if (!authResult.authorized) {
-      return authResult.response;
-    }
-
-    const tools = toolsRegistry.getAll();
-
-    // Return tools in a simplified format (without executor functions)
-    return NextResponse.json({
-      tools: tools.map((tool) => ({
-        id: tool.id,
-        name: tool.name,
-        description: tool.description,
-        inputSchema: tool.inputSchema,
-      })),
-    });
+    return NextResponse.json({ tools });
   } catch (error) {
-    console.error('[API Tools] Error in GET handler:', error);
+    console.error('Get tools error:', error);
     return NextResponse.json(
-      { error: 'Failed to load tools', details: error instanceof Error ? error.message : String(error) },
+      { error: 'Failed to get tools' },
       { status: 500 }
     );
   }

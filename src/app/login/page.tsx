@@ -24,11 +24,27 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        const text = await response.text();
+        data = text ? JSON.parse(text) : {};
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError);
+        data = { error: `Server error: ${response.status} ${response.statusText}` };
+      }
 
       if (!response.ok) {
-        setError(data.error || 'Login failed');
+        // Show the actual error message from the server
+        const errorMessage = data.error || `Login failed (${response.status})`;
+        setError(errorMessage);
         setLoading(false);
+        console.error('Login error:', { 
+          status: response.status, 
+          statusText: response.statusText,
+          error: errorMessage, 
+          data,
+          email 
+        });
         return;
       }
 

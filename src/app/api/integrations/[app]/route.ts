@@ -59,7 +59,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     // Disconnect via adapter if connected
     if (integration.status === 'CONNECTED') {
       try {
-        const adapter = createIntegrationAdapter(app as 'gmail' | 'slack');
+        const adapter = createIntegrationAdapter(app as 'gmail' | 'slack' | 'office365');
         const credentialsData = (integration.credentials as { encrypted?: string })?.encrypted;
         if (credentialsData) {
           const decrypted = decrypt(credentialsData);

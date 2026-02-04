@@ -5,7 +5,19 @@
 
 import { db } from './db';
 
-export type ResourceType = 'skill' | 'version' | 'user' | 'auth' | 'mcp' | 'agent' | 'workflow' | 'align';
+export type ResourceType =
+  | 'skill'
+  | 'version'
+  | 'user'
+  | 'auth'
+  | 'mcp'
+  | 'agent'
+  | 'workflow'
+  | 'align'
+  | 'org_chart'
+  | 'org_node'
+  | 'workspace'
+  | 'workspace_member';
 
 export interface AuditEntry {
   action: string;
@@ -463,6 +475,173 @@ export const audit = {
       action: 'workflow.unshared',
       resourceType: 'workflow',
       resourceId: workflowId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  orgChartCreated: (chartId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'org_chart.created',
+      resourceType: 'org_chart',
+      resourceId: chartId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  orgChartUpdated: (chartId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'org_chart.updated',
+      resourceType: 'org_chart',
+      resourceId: chartId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  orgChartDeleted: (chartId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'org_chart.deleted',
+      resourceType: 'org_chart',
+      resourceId: chartId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  orgNodeCreated: (nodeId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'org_node.created',
+      resourceType: 'org_node',
+      resourceId: nodeId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  orgNodeUpdated: (nodeId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'org_node.updated',
+      resourceType: 'org_node',
+      resourceId: nodeId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  orgNodeDeleted: (nodeId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'org_node.deleted',
+      resourceType: 'org_node',
+      resourceId: nodeId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  orgNodeMoved: (nodeId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'org_node.moved',
+      resourceType: 'org_node',
+      resourceId: nodeId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  // Department Workspaces
+  workspaceCreated: (workspaceId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'workspace.created',
+      resourceType: 'workspace',
+      resourceId: workspaceId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  workspaceUpdated: (workspaceId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'workspace.updated',
+      resourceType: 'workspace',
+      resourceId: workspaceId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  workspaceDeleted: (workspaceId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'workspace.deleted',
+      resourceType: 'workspace',
+      resourceId: workspaceId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  workspaceMemberAdded: (workspaceId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'workspace.member.added',
+      resourceType: 'workspace_member',
+      resourceId: workspaceId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  workspaceMemberRemoved: (workspaceId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'workspace.member.removed',
+      resourceType: 'workspace_member',
+      resourceId: workspaceId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  workspaceMemberRoleChanged: (workspaceId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'workspace.member.role_changed',
+      resourceType: 'workspace_member',
+      resourceId: workspaceId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  // Skill/Tool Execution
+  skillExecuted: (skillId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'skill.executed',
+      resourceType: 'skill',
+      resourceId: skillId,
+      userId,
+      details: metadata,
+      ipAddress: request ? getIpAddress(request) : undefined,
+      userAgent: request ? getUserAgent(request) : undefined,
+    }),
+
+  toolExecuted: (toolId: string, userId: string, metadata?: Record<string, unknown>, request?: Request) =>
+    logAudit({
+      action: 'tool.executed',
+      resourceType: 'mcp',
+      resourceId: toolId,
       userId,
       details: metadata,
       ipAddress: request ? getIpAddress(request) : undefined,

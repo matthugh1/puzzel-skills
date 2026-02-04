@@ -24,6 +24,14 @@ export const PERMISSIONS = {
   ALIGN_READ: 'align:read',
   ALIGN_WRITE: 'align:write',
   ALIGN_ADMIN: 'align:admin',
+  ORG_CHART_READ: 'org_chart:read',
+  ORG_CHART_WRITE: 'org_chart:write',
+  ORG_CHART_ADMIN: 'org_chart:admin',
+  WORKSPACES_READ: 'workspaces:read',
+  WORKSPACES_CREATE: 'workspaces:create',
+  WORKSPACES_UPDATE: 'workspaces:update',
+  WORKSPACES_DELETE: 'workspaces:delete',
+  WORKSPACES_ADMIN: 'workspaces:admin',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

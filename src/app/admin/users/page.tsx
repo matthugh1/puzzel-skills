@@ -10,6 +10,12 @@ interface User {
   email: string;
   name: string | null;
   roles: string[];
+  workspaces?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    role: 'OWNER' | 'ADMIN' | 'MEMBER';
+  }>;
   createdAt: Date | string;
 }
 

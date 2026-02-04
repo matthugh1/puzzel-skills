@@ -25,31 +25,34 @@ model User {
   updatedAt    DateTime     @updatedAt
 
   // Relations
-  roles               UserRole[]
-  ownedSkills         Skill[]            @relation("SkillOwner")
-  createdVersions     SkillVersion[]     @relation("VersionCreator")
-  approvedVersions    SkillVersion[]     @relation("VersionApprover")
-  auditLogs           AuditLog[]
-  initiatedRuns       AgentRun[]         @relation("RunInitiator")
-  initiatedBatches    BatchRun[]         @relation("BatchInitiator")
-  createdPolicies     RunPolicy[]        @relation("PolicyCreator")
-  requestedApprovals  RunApproval[]      @relation("ApprovalRequester")
-  approvedRuns        RunApproval[]      @relation("ApprovalApprover")
-  assignedTasks       RunTask[]          @relation("TaskAssignee")
-  requestedDataInputs DataInputRequest[] @relation("DataInputRequester")
-  assignedDataInputs  DataInputRequest[] @relation("DataInputAssignee")
-  selectedPaths       RunPath[]          @relation("PathSelector")
-  ownedWorkflows      Workflow[]         @relation("WorkflowOwner")
-  sharedWorkflows     WorkflowShare[]    @relation("WorkflowSharee")
-  sharedWorkflowsBy   WorkflowShare[]    @relation("WorkflowSharer")
-  ownedFolders        Folder[]           @relation("FolderOwner")
-  integrations        AppIntegration[]
-  ownedAgents         Agent[]            @relation("AgentOwner")
-  alignmentSnapshots  AlignmentSnapshot[] @relation("AlignmentOwner")
-  ownedOpportunities  Opportunity[]       @relation("OpportunityOwner")
-  ownedRoadmapItems   RoadmapItem[]        @relation("RoadmapOwner")
-  coalitionMemberships CoalitionMember[]  @relation("CoalitionMemberUser")
-  createdGuardrails   GuardrailPolicy[]   @relation("GuardrailCreator")
+  roles                UserRole[]
+  ownedSkills          Skill[]                     @relation("SkillOwner")
+  createdVersions      SkillVersion[]              @relation("VersionCreator")
+  approvedVersions     SkillVersion[]              @relation("VersionApprover")
+  auditLogs            AuditLog[]
+  initiatedRuns        AgentRun[]                  @relation("RunInitiator")
+  initiatedBatches     BatchRun[]                  @relation("BatchInitiator")
+  createdPolicies      RunPolicy[]                 @relation("PolicyCreator")
+  requestedApprovals   RunApproval[]               @relation("ApprovalRequester")
+  approvedRuns         RunApproval[]               @relation("ApprovalApprover")
+  assignedTasks        RunTask[]                   @relation("TaskAssignee")
+  requestedDataInputs  DataInputRequest[]          @relation("DataInputRequester")
+  assignedDataInputs   DataInputRequest[]          @relation("DataInputAssignee")
+  selectedPaths        RunPath[]                   @relation("PathSelector")
+  ownedWorkflows       Workflow[]                  @relation("WorkflowOwner")
+  sharedWorkflows      WorkflowShare[]             @relation("WorkflowSharee")
+  sharedWorkflowsBy    WorkflowShare[]             @relation("WorkflowSharer")
+  ownedFolders         Folder[]                    @relation("FolderOwner")
+  integrations         AppIntegration[]
+  ownedAgents          Agent[]                     @relation("AgentOwner")
+  ownedOrgCharts       OrgChart[]                  @relation("OrgChartOwner")
+  alignmentSnapshots   AlignmentSnapshot[]         @relation("AlignmentOwner")
+  ownedOpportunities   Opportunity[]               @relation("OpportunityOwner")
+  ownedRoadmapItems    RoadmapItem[]               @relation("RoadmapOwner")
+  coalitionMemberships CoalitionMember[]           @relation("CoalitionMemberUser")
+  createdGuardrails    GuardrailPolicy[]           @relation("GuardrailCreator")
+  ownedWorkspaces      DepartmentWorkspace[]       @relation("WorkspaceOwner")
+  workspaceMemberships DepartmentWorkspaceMember[] @relation("WorkspaceMember")
 
   @@map("users")
 }
@@ -238,10 +241,10 @@ enum CoalitionRole {
 }
 
 model AlignmentSnapshot {
-  id      String           @id @default(cuid())
+  id      String          @id @default(cuid())
   title   String
   summary String?
-  status  AlignmentStatus  @default(DRAFT)
+  status  AlignmentStatus @default(DRAFT)
 
   ownerId String
   owner   User   @relation("AlignmentOwner", fields: [ownerId], references: [id])
@@ -249,9 +252,9 @@ model AlignmentSnapshot {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  opportunities    Opportunity[]
-  roadmapItems     RoadmapItem[]
-  coalitionMembers CoalitionMember[]
+  opportunities     Opportunity[]
+  roadmapItems      RoadmapItem[]
+  coalitionMembers  CoalitionMember[]
   guardrailPolicies GuardrailPolicy[]
 
   @@index([ownerId])
@@ -260,16 +263,16 @@ model AlignmentSnapshot {
 }
 
 model Opportunity {
-  id              String            @id @default(cuid())
-  snapshotId      String
-  snapshot        AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
-  title           String
-  description     String?
-  department      String?
-  valueScore      Int
+  id               String            @id @default(cuid())
+  snapshotId       String
+  snapshot         AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?
+  department       String?
+  valueScore       Int
   feasibilityScore Int
   timeToPilotWeeks Int?
-  status          OpportunityStatus @default(IDEA)
+  status           OpportunityStatus @default(IDEA)
 
   ownerId String
   owner   User   @relation("OpportunityOwner", fields: [ownerId], references: [id])
@@ -287,15 +290,15 @@ model Opportunity {
 }
 
 model RoadmapItem {
-  id           String            @id @default(cuid())
-  snapshotId   String
-  snapshot     AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  id            String            @id @default(cuid())
+  snapshotId    String
+  snapshot      AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
   opportunityId String?
-  opportunity  Opportunity?     @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
-  title        String
-  priority     Int
+  opportunity   Opportunity?      @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  title         String
+  priority      Int
   targetQuarter String?
-  status       RoadmapStatus     @default(PLANNED)
+  status        RoadmapStatus     @default(PLANNED)
 
   ownerId String
   owner   User   @relation("RoadmapOwner", fields: [ownerId], references: [id])
@@ -330,15 +333,15 @@ model CoalitionMember {
 }
 
 model GuardrailPolicy {
-  id               String            @id @default(cuid())
-  snapshotId       String
-  snapshot         AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
-  createdById      String
-  createdBy        User              @relation("GuardrailCreator", fields: [createdById], references: [id])
+  id                String            @id @default(cuid())
+  snapshotId        String
+  snapshot          AlignmentSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  createdById       String
+  createdBy         User              @relation("GuardrailCreator", fields: [createdById], references: [id])
   allowedCategories String[]
   blockedCategories String[]
-  requiresApproval Boolean           @default(false)
-  notes            String?
+  requiresApproval  Boolean           @default(false)
+  notes             String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -679,6 +682,7 @@ model SkillVersionMetadata {
   id               String       @id @default(cuid())
   skillVersionId   String       @unique
   skillVersion     SkillVersion @relation(fields: [skillVersionId], references: [id], onDelete: Cascade)
+  inputContract    Json?
   outputContract   Json?
   capabilities     String[]
   preferredInputs  Json? // String[] | null
@@ -706,10 +710,10 @@ model Workflow {
   plan        Json // Workflow step definition (LangGraph-compatible)
   status      WorkflowStatus @default(DRAFT)
   visibility  Visibility     @default(ORG)
-  
+
   // LLM Configuration
-  llmProvider String?  // 'openai' | 'anthropic' | null (defaults to openai)
-  llmModel    String?  // Model name (e.g., 'gpt-4o-mini', 'claude-3-7-sonnet-latest')
+  llmProvider String? // 'openai' | 'anthropic' | null (defaults to openai)
+  llmModel    String? // Model name (e.g., 'gpt-4o-mini', 'claude-3-7-sonnet-latest')
 
   ownerId    String
   owner      User      @relation("WorkflowOwner", fields: [ownerId], references: [id])
@@ -742,23 +746,24 @@ model Workflow {
 // ============================================================================
 
 model Agent {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   name        String
   description String?
   goal        String
   status      AgentStatus @default(READY)
-  config      Json?    // LLM config, capabilities
-  
-  ownerId     String
-  owner       User     @relation("AgentOwner", fields: [ownerId], references: [id])
-  
-  workflowId  String?
-  workflow    Workflow? @relation(fields: [workflowId], references: [id])
+  config      Json? // LLM config, capabilities
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  ownerId String
+  owner   User   @relation("AgentOwner", fields: [ownerId], references: [id])
 
-  runs        AgentRun[]
+  workflowId String?
+  workflow   Workflow? @relation(fields: [workflowId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  runs     AgentRun[]
+  orgNodes OrgNode[]
 
   @@index([ownerId])
   @@index([status])
@@ -769,6 +774,56 @@ enum AgentStatus {
   READY
   RUNNING
   DISABLED
+}
+
+enum OrgNodeType {
+  DEPARTMENT
+  TEAM
+  AGENT
+}
+
+model OrgChart {
+  id         String     @id @default(cuid())
+  name       String
+  visibility Visibility @default(ORG)
+  isDefault  Boolean    @default(false)
+
+  ownerId String
+  owner   User   @relation("OrgChartOwner", fields: [ownerId], references: [id])
+
+  nodes     OrgNode[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([ownerId])
+  @@index([isDefault])
+  @@map("org_charts")
+}
+
+model OrgNode {
+  id              String      @id @default(cuid())
+  chartId         String
+  chart           OrgChart    @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  type            OrgNodeType
+  name            String
+  parentId        String?
+  parent          OrgNode?    @relation("OrgNodeHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children        OrgNode[]   @relation("OrgNodeHierarchy")
+  agentId         String?
+  agent           Agent?      @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  roleTitle       String?
+  departmentLabel String?
+  order           Int         @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([chartId, agentId])
+  @@index([chartId])
+  @@index([parentId])
+  @@index([type])
+  @@index([agentId])
+  @@map("org_nodes")
 }
 
 model Folder {
@@ -913,4 +968,54 @@ model AuditLog {
   @@index([resourceType, resourceId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// ============================================================================
+// DEPARTMENT WORKSPACES
+// ============================================================================
+
+enum WorkspaceMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model DepartmentWorkspace {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  slug        String  @unique // URL-friendly identifier (e.g., "engineering", "sales")
+  isActive    Boolean @default(true)
+
+  ownerId String
+  owner   User   @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  members DepartmentWorkspaceMember[]
+
+  @@index([ownerId])
+  @@index([slug])
+  @@index([isActive])
+  @@map("department_workspaces")
+}
+
+model DepartmentWorkspaceMember {
+  id          String              @id @default(cuid())
+  workspaceId String
+  workspace   DepartmentWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User                @relation("WorkspaceMember", fields: [userId], references: [id], onDelete: Cascade)
+  role        WorkspaceMemberRole @default(MEMBER)
+
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([role])
+  @@map("department_workspace_members")
 }

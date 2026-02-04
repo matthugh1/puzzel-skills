@@ -21,11 +21,25 @@ export async function POST(request: Request) {
 
     // Clear auth token cookie
     const response = NextResponse.json({ success: true });
-    response.cookies.delete('auth-token');
+    
+    // Clear cookie in response with proper settings
+    response.cookies.set('auth-token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 0, // Expire immediately
+      path: '/',
+    });
     
     // Also clear via cookies() API
     const cookieStore = await cookies();
-    cookieStore.delete('auth-token');
+    cookieStore.set('auth-token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 0,
+      path: '/',
+    });
 
     return response;
   } catch (error) {

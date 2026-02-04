@@ -9,12 +9,26 @@ interface Role {
   name: string;
 }
 
+interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface UserWorkspace {
+  id: string;
+  name: string;
+  slug: string;
+  role: 'OWNER' | 'ADMIN' | 'MEMBER';
+}
+
 interface User {
   id: string;
   email: string;
   name: string | null;
   roles: string[];
   roleIds: string[];
+  workspaces?: UserWorkspace[];
 }
 
 export default function EditUserPage() {
@@ -24,9 +38,11 @@ export default function EditUserPage() {
 
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [workspaceLoading, setWorkspaceLoading] = useState<Record<string, boolean>>({});
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -45,14 +61,16 @@ export default function EditUserPage() {
       setLoading(true);
       setError(null);
 
-      // Load user and roles in parallel
-      const [userResponse, rolesResponse] = await Promise.all([
+      // Load user, roles, and workspaces in parallel
+      const [userResponse, rolesResponse, workspacesResponse] = await Promise.all([
         apiRequest<{ user: User }>(`/api/users/${id}`),
         apiRequest<{ roles: Role[] }>('/api/roles'),
+        apiRequest<{ workspaces: Workspace[] }>('/api/workspaces'),
       ]);
 
       setUser(userResponse.user);
       setRoles(rolesResponse.roles);
+      setWorkspaces(workspacesResponse.workspaces);
       setFormData({
         name: userResponse.user.name || '',
         email: userResponse.user.email,
@@ -94,6 +112,96 @@ export default function EditUserPage() {
       setSaving(false);
     }
   };
+
+  const handleAddToWorkspace = async (workspaceId: string, role: 'OWNER' | 'ADMIN' | 'MEMBER' = 'MEMBER') => {
+    setWorkspaceLoading({ ...workspaceLoading, [workspaceId]: true });
+    try {
+      const csrfToken = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrf-token='))
+        ?.split('=')[1];
+
+      await fetch(`/api/workspaces/${workspaceId}/members`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken || '',
+        },
+        body: JSON.stringify({ userId: id, role }),
+      });
+
+      // Reload user data to get updated workspace memberships
+      await loadData();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to add user to workspace');
+      console.error('Error adding user to workspace:', err);
+    } finally {
+      setWorkspaceLoading({ ...workspaceLoading, [workspaceId]: false });
+    }
+  };
+
+  const handleRemoveFromWorkspace = async (workspaceId: string) => {
+    if (!confirm('Are you sure you want to remove this user from the workspace?')) {
+      return;
+    }
+
+    setWorkspaceLoading({ ...workspaceLoading, [workspaceId]: true });
+    try {
+      const csrfToken = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrf-token='))
+        ?.split('=')[1];
+
+      await fetch(`/api/workspaces/${workspaceId}/members/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken || '',
+        },
+      });
+
+      // Reload user data to get updated workspace memberships
+      await loadData();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to remove user from workspace');
+      console.error('Error removing user from workspace:', err);
+    } finally {
+      setWorkspaceLoading({ ...workspaceLoading, [workspaceId]: false });
+    }
+  };
+
+  const handleUpdateWorkspaceRole = async (workspaceId: string, role: 'OWNER' | 'ADMIN' | 'MEMBER') => {
+    setWorkspaceLoading({ ...workspaceLoading, [workspaceId]: true });
+    try {
+      const csrfToken = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('csrf-token='))
+        ?.split('=')[1];
+
+      await fetch(`/api/workspaces/${workspaceId}/members/${id}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken || '',
+        },
+        body: JSON.stringify({ role }),
+      });
+
+      // Reload user data to get updated workspace memberships
+      await loadData();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to update workspace role');
+      console.error('Error updating workspace role:', err);
+    } finally {
+      setWorkspaceLoading({ ...workspaceLoading, [workspaceId]: false });
+    }
+  };
+
+  const userWorkspaceIds = user?.workspaces?.map((w) => w.id) || [];
+  const availableWorkspaces = workspaces.filter((w) => !userWorkspaceIds.includes(w.id));
 
   if (loading) {
     return (
@@ -308,6 +416,149 @@ export default function EditUserPage() {
                   </label>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: 'var(--color-text)',
+                  marginBottom: 'var(--spacing-xs)',
+                }}
+              >
+                Workspace Memberships
+              </label>
+              
+              {/* Current workspace memberships */}
+              {user?.workspaces && user.workspaces.length > 0 && (
+                <div style={{ 
+                  marginBottom: 'var(--spacing-md)',
+                  padding: 'var(--spacing-md)',
+                  background: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                }}>
+                  {user.workspaces.map((workspace) => (
+                    <div
+                      key={workspace.id}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: 'var(--spacing-sm) 0',
+                        borderBottom: '1px solid var(--color-border)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 500, color: 'var(--color-text)' }}>
+                          {workspace.name}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+                          {workspace.slug}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
+                        <select
+                          value={workspace.role}
+                          onChange={(e) => handleUpdateWorkspaceRole(workspace.id, e.target.value as 'OWNER' | 'ADMIN' | 'MEMBER')}
+                          disabled={workspaceLoading[workspace.id]}
+                          style={{
+                            padding: 'var(--spacing-xs) var(--spacing-sm)',
+                            background: 'var(--color-background)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.75rem',
+                            color: 'var(--color-text)',
+                            cursor: workspaceLoading[workspace.id] ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          <option value="MEMBER">Member</option>
+                          <option value="ADMIN">Admin</option>
+                          <option value="OWNER">Owner</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFromWorkspace(workspace.id)}
+                          disabled={workspaceLoading[workspace.id]}
+                          style={{
+                            padding: 'var(--spacing-xs) var(--spacing-sm)',
+                            background: 'var(--color-danger)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.75rem',
+                            cursor: workspaceLoading[workspace.id] ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add to workspace */}
+              {availableWorkspaces.length > 0 && (
+                <div style={{
+                  padding: 'var(--spacing-md)',
+                  background: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                }}>
+                  <div style={{ marginBottom: 'var(--spacing-sm)', fontSize: '0.875rem', fontWeight: 500, color: 'var(--color-text)' }}>
+                    Add to Workspace
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                    {availableWorkspaces.map((workspace) => (
+                      <div
+                        key={workspace.id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: 'var(--spacing-xs) 0',
+                        }}
+                      >
+                        <span style={{ fontSize: '0.875rem', color: 'var(--color-text)' }}>
+                          {workspace.name}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleAddToWorkspace(workspace.id)}
+                          disabled={workspaceLoading[workspace.id]}
+                          style={{
+                            padding: 'var(--spacing-xs) var(--spacing-sm)',
+                            background: 'var(--color-primary)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.75rem',
+                            cursor: workspaceLoading[workspace.id] ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          {workspaceLoading[workspace.id] ? 'Adding...' : 'Add'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(!user?.workspaces || user.workspaces.length === 0) && availableWorkspaces.length === 0 && (
+                <div style={{
+                  padding: 'var(--spacing-md)',
+                  background: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.875rem',
+                }}>
+                  No workspaces available. User is already a member of all workspaces.
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'flex-end' }}>

@@ -7,6 +7,14 @@ import { SkillForm } from '@/components/forms/SkillForm';
 import { VersionForm } from '@/components/forms/VersionForm';
 import { VersionDiff } from '@/components/editor/VersionDiff';
 
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  roles: string[];
+  permissions: string[];
+}
+
 interface Skill {
   id: string;
   name: string;
@@ -24,6 +32,8 @@ interface Skill {
       executorConfig?: {
         toolId?: string;
       };
+      inputContract?: Record<string, unknown> | null;
+      outputContract?: Record<string, unknown> | null;
     } | null;
   }>;
 }
@@ -38,12 +48,36 @@ export default function EditSkillPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'metadata' | 'version' | 'diff'>('metadata');
   const [newVersionContent, setNewVersionContent] = useState('');
+  const [user, setUser] = useState<User | null>(null);
+  const [publishLoading, setPublishLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
       loadSkill();
     }
   }, [id]);
+
+  useEffect(() => {
+    // Fetch user info to check permissions
+    const loadUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.user) {
+            setUser(data.user);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading user:', err);
+      }
+    };
+    loadUser();
+  }, []);
+
+  const canPublish = user?.permissions.includes('skills:approve') ?? false;
 
   const loadSkill = async () => {
     try {
@@ -114,15 +148,66 @@ export default function EditSkillPage() {
     }
   };
 
-  const handleVersionSubmit = async (data: { content: string; changeNotes: string }) => {
+  const handleVersionSubmit = async (data: {
+    content: string;
+    changeNotes: string;
+    inputContract?: Record<string, unknown> | null;
+    outputContract?: Record<string, unknown> | null;
+  }) => {
     try {
       await skillsApi.createVersion(id, {
         content: data.content,
         changeNotes: data.changeNotes,
+        inputContract: data.inputContract || undefined,
+        outputContract: data.outputContract || undefined,
       });
       router.push(`/my-skills/${id}`);
     } catch (err) {
       throw err;
+    }
+  };
+
+  const handlePublish = async (data: {
+    content: string;
+    changeNotes: string;
+    inputContract?: Record<string, unknown> | null;
+    outputContract?: Record<string, unknown> | null;
+  }) => {
+    setPublishLoading(true);
+    setError(null);
+
+    try {
+      // Create the new version
+      const versionResponse = await skillsApi.createVersion(id, {
+        content: data.content,
+        changeNotes: data.changeNotes,
+        inputContract: data.inputContract || undefined,
+        outputContract: data.outputContract || undefined,
+      });
+      const versionId = (versionResponse.version as { id: string }).id;
+
+      // Submit for approval
+      await skillsApi.submitForApproval(id, versionId);
+
+      // If user has approve permission, auto-approve
+      if (canPublish) {
+        await skillsApi.approve(id, versionId, 'Auto-approved on publish');
+      }
+
+      router.push(`/my-skills/${id}`);
+    } catch (err: unknown) {
+      let errorMessage = 'Failed to publish version';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        const errorObj = err as Error & { details?: unknown };
+        if (errorObj.details) {
+          errorMessage += `: ${JSON.stringify(errorObj.details)}`;
+        }
+      }
+      setError(errorMessage);
+      console.error('Error publishing version:', err);
+    } finally {
+      setPublishLoading(false);
     }
   };
 
@@ -286,11 +371,16 @@ export default function EditSkillPage() {
             )}
             <VersionForm
               initialContent={latestVersion?.content || ''}
+              initialInputContract={latestVersion?.metadata?.inputContract || null}
+              initialOutputContract={latestVersion?.metadata?.outputContract || null}
               onSubmit={handleVersionSubmit}
               onCancel={() => router.back()}
               submitLabel="Create Version"
               requireChangeNotes={true}
               onContentChange={setNewVersionContent}
+              onPublish={handlePublish}
+              publishLabel={publishLoading ? 'Publishing...' : canPublish ? 'Publish' : 'Submit for Approval'}
+              showPublishButton={true}
             />
             {newVersionContent && newVersionContent !== latestVersion?.content && (
               <div style={{ marginTop: 'var(--spacing-lg)' }}>

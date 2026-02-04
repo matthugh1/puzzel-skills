@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { skillsApi } from '@/lib/api-client';
 import { SkillCard } from '@/components/skills/SkillCard';
 import { SkillSearch } from '@/components/skills/SkillSearch';
@@ -18,12 +19,16 @@ interface Skill {
 }
 
 export default function SkillsPage() {
+  const router = useRouter();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [promptInput, setPromptInput] = useState('');
+  const [promptLoading, setPromptLoading] = useState(false);
+  const [showPromptInput, setShowPromptInput] = useState(false);
 
   // Debounce search query
   useEffect(() => {
@@ -67,6 +72,42 @@ export default function SkillsPage() {
     return Array.from(cats).sort();
   }, [skills]);
 
+  const handleCreateFromPrompt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promptInput.trim() || promptLoading) return;
+
+    setPromptLoading(true);
+    setError(null);
+
+    try {
+      // Call compose API to generate skill proposal
+      const response = await skillsApi.compose([
+        {
+          role: 'user',
+          content: promptInput.trim(),
+        },
+      ]);
+
+      if (response.response.type === 'proposal' && response.response.skill) {
+        // Store proposal in sessionStorage for the create page to pick up
+        sessionStorage.setItem('skillProposal', JSON.stringify(response.response.skill));
+        // Navigate to create page
+        router.push('/my-skills/new?fromPrompt=true');
+      } else {
+        // If we got a question instead of a proposal, we need more conversation
+        // For now, let's navigate to the chat page with the prompt
+        sessionStorage.setItem('initialPrompt', promptInput.trim());
+        router.push('/my-skills/new/chat');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to generate skill from prompt';
+      setError(errorMessage);
+      console.error('Error creating skill from prompt:', err);
+    } finally {
+      setPromptLoading(false);
+    }
+  };
+
   return (
     <div className="page-container">
       <header className="page-header">
@@ -89,10 +130,103 @@ export default function SkillsPage() {
           >
             Skills Browser
           </h1>
-          <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
-            {skills.length} {skills.length === 1 ? 'skill' : 'skills'}
+          <div style={{ display: 'flex', gap: 'var(--spacing-md)', alignItems: 'center' }}>
+            <div style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
+              {skills.length} {skills.length === 1 ? 'skill' : 'skills'}
+            </div>
+            <button
+              onClick={() => setShowPromptInput(!showPromptInput)}
+              style={{
+                padding: 'var(--spacing-sm) var(--spacing-md)',
+                background: showPromptInput ? 'var(--color-surface-secondary)' : 'var(--color-primary)',
+                color: showPromptInput ? 'var(--color-text)' : 'var(--color-on-primary)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                cursor: 'pointer',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              {showPromptInput ? 'Cancel' : '+ Create from Prompt'}
+            </button>
           </div>
         </div>
+
+        {showPromptInput && (
+          <form
+            onSubmit={handleCreateFromPrompt}
+            style={{
+              padding: 'var(--spacing-lg)',
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              marginBottom: 'var(--spacing-md)',
+            }}
+          >
+            <label
+              htmlFor="prompt-input"
+              style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: 'var(--color-text)',
+                marginBottom: 'var(--spacing-sm)',
+              }}
+            >
+              Describe the skill you want to create
+            </label>
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'flex-end' }}>
+              <textarea
+                id="prompt-input"
+                value={promptInput}
+                onChange={(e) => setPromptInput(e.target.value)}
+                placeholder="e.g., Create a skill that formats documents into clean markdown with proper headings and structure"
+                disabled={promptLoading}
+                style={{
+                  flex: 1,
+                  padding: 'var(--spacing-md)',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--color-border)',
+                  fontSize: '0.875rem',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text)',
+                  background: 'var(--color-background)',
+                  resize: 'vertical',
+                  minHeight: '80px',
+                }}
+                rows={3}
+              />
+              <button
+                type="submit"
+                disabled={!promptInput.trim() || promptLoading}
+                style={{
+                  padding: 'var(--spacing-md) var(--spacing-lg)',
+                  background: promptInput.trim() && !promptLoading ? 'var(--color-primary)' : 'var(--color-surface-secondary)',
+                  color: promptInput.trim() && !promptLoading ? 'var(--color-on-primary)' : 'var(--color-text-muted)',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  cursor: promptInput.trim() && !promptLoading ? 'pointer' : 'not-allowed',
+                  fontFamily: 'var(--font-body)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {promptLoading ? 'Generating...' : 'Create Skill'}
+              </button>
+            </div>
+            <p
+              style={{
+                marginTop: 'var(--spacing-xs)',
+                fontSize: '0.75rem',
+                color: 'var(--color-text-secondary)',
+              }}
+            >
+              AI will generate a complete skill template based on your description
+            </p>
+          </form>
+        )}
 
         <div style={{ marginBottom: 'var(--spacing-md)' }}>
           <SkillSearch value={searchQuery} onChange={setSearchQuery} />

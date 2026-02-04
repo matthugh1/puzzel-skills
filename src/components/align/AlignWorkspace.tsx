@@ -78,6 +78,7 @@ export function AlignWorkspace({
   const [roadmapItems, setRoadmapItems] = useState(initialRoadmap);
   const [coalitionMembers, setCoalitionMembers] = useState(initialCoalition);
   const [guardrails, setGuardrails] = useState(initialGuardrails);
+  const [clientReady, setClientReady] = useState(false);
 
   const [opportunityTitle, setOpportunityTitle] = useState('');
   const [opportunityDept, setOpportunityDept] = useState('');
@@ -102,6 +103,10 @@ export function AlignWorkspace({
   const [roadmapError, setRoadmapError] = useState<string | null>(null);
   const [coalitionError, setCoalitionError] = useState<string | null>(null);
   const [guardrailError, setGuardrailError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setClientReady(true);
+  }, []);
 
   const handleUpdateSnapshot = async () => {
     setSnapshotError(null);
@@ -429,7 +434,12 @@ export function AlignWorkspace({
       <section style={sectionStyle}>
         <header style={sectionHeaderStyle}>
           <h2 style={sectionTitleStyle}>Snapshot</h2>
-          <div style={sectionMetaStyle}>Last updated: {new Date(snapshot.updatedAt).toLocaleString()}</div>
+          <div style={sectionMetaStyle}>
+            Last updated:{' '}
+            <span suppressHydrationWarning>
+              {clientReady ? new Date(snapshot.updatedAt).toLocaleString() : '--'}
+            </span>
+          </div>
         </header>
         {snapshotError && <div style={{ color: 'var(--color-danger)' }}>{snapshotError}</div>}
         <div style={{ display: 'grid', gap: 'var(--spacing-sm)' }}>

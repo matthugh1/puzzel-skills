@@ -88,7 +88,7 @@ export default function RunsPage() {
               color: 'var(--color-text)',
             }}
           >
-            My Agents
+            Runs
           </h1>
           <Link
             href="/runs/new"
@@ -105,7 +105,7 @@ export default function RunsPage() {
               fontFamily: 'var(--font-body)',
             }}
           >
-            + New Agent
+            + New Run
           </Link>
         </div>
       </header>
@@ -121,7 +121,7 @@ export default function RunsPage() {
               color: 'var(--color-text-secondary)',
             }}
           >
-            Loading agents...
+            Loading runs...
           </div>
         )}
 
@@ -148,7 +148,7 @@ export default function RunsPage() {
             }}
           >
             <p style={{ fontSize: '1.125rem', marginBottom: 'var(--spacing-md)' }}>
-              No agents yet
+              No runs yet
             </p>
             <Link
               href="/runs/new"
@@ -165,7 +165,7 @@ export default function RunsPage() {
                 fontFamily: 'var(--font-body)',
               }}
             >
-              Create Your First Agent
+              Create Your First Run
             </Link>
           </div>
         )}

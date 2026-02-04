@@ -54,11 +54,22 @@ export async function GET(request: Request) {
           },
         },
       },
+      workspaceMemberships: {
+        include: {
+          workspace: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+        },
+      },
     },
     orderBy: { createdAt: 'desc' },
   });
 
-  // Transform to include role names
+  // Transform to include role names and workspace memberships
   const usersWithRoles = users.map((user) => ({
     id: user.id,
     email: user.email,
@@ -67,6 +78,12 @@ export async function GET(request: Request) {
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     roles: user.roles.map((ur) => ur.role.name),
+    workspaces: user.workspaceMemberships.map((wm) => ({
+      id: wm.workspace.id,
+      name: wm.workspace.name,
+      slug: wm.workspace.slug,
+      role: wm.role,
+    })),
   }));
 
   return NextResponse.json({ users: usersWithRoles });

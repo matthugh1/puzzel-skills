@@ -37,6 +37,17 @@ export async function GET(request: Request, context: RouteContext) {
           },
         },
       },
+      workspaceMemberships: {
+        include: {
+          workspace: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -57,6 +68,12 @@ export async function GET(request: Request, context: RouteContext) {
       updatedAt: user.updatedAt,
       roles: user.roles.map((ur) => ur.role.name),
       roleIds: user.roles.map((ur) => ur.roleId),
+      workspaces: user.workspaceMemberships.map((wm) => ({
+        id: wm.workspace.id,
+        name: wm.workspace.name,
+        slug: wm.workspace.slug,
+        role: wm.role,
+      })),
     },
   });
 }

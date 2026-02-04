@@ -7,6 +7,12 @@ interface User {
   email: string;
   name: string | null;
   roles: string[];
+  workspaces?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    role: 'OWNER' | 'ADMIN' | 'MEMBER';
+  }>;
   createdAt: Date | string;
 }
 
@@ -73,6 +79,18 @@ export function UserTable({ users, onEdit }: UserTableProps) {
               }}
             >
               Roles
+            </th>
+            <th
+              style={{
+                padding: 'var(--spacing-md)',
+                textAlign: 'left',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: 'var(--color-text)',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              Workspaces
             </th>
             <th
               style={{
@@ -161,6 +179,36 @@ export function UserTable({ users, onEdit }: UserTableProps) {
                       </span>
                     ))}
                   </div>
+                </td>
+                <td
+                  style={{
+                    padding: 'var(--spacing-md)',
+                    fontSize: '0.875rem',
+                    color: 'var(--color-text)',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  {user.workspaces && user.workspaces.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-xs)' }}>
+                      {user.workspaces.map((workspace) => (
+                        <span
+                          key={workspace.id}
+                          style={{
+                            background: 'var(--color-accent-bg)',
+                            color: 'var(--color-accent-text)',
+                            padding: '2px var(--spacing-sm)',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.75rem',
+                          }}
+                          title={`${workspace.name} (${workspace.role})`}
+                        >
+                          {workspace.name}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span style={{ color: 'var(--color-text-muted)' }}>-</span>
+                  )}
                 </td>
                 <td
                   style={{

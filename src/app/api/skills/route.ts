@@ -100,7 +100,19 @@ export async function POST(request: NextRequest) {
   try {
     // Validate input
     const body = await validateRequestBody(request, validationSchemas.createSkill);
-    const { name, description, category, tags, content, visibility, toolId } = body;
+    const {
+      name,
+      description,
+      category,
+      tags,
+      content,
+      visibility,
+      toolId,
+      inputContract,
+      outputContract,
+    } = body;
+
+    const hasMetadata = Boolean(toolId || inputContract || outputContract);
 
     // Create skill with initial version in a transaction
     const skill = await db.skill.create({
@@ -118,12 +130,13 @@ export async function POST(request: NextRequest) {
             content,
             status: 'DRAFT',
             createdById: user.id,
-            metadata: toolId
+            metadata: hasMetadata
               ? {
                   create: {
-                    executorConfig: {
-                      toolId,
-                    },
+                    capabilities: [],
+                    executorConfig: toolId ? { toolId } : undefined,
+                    inputContract: inputContract || undefined,
+                    outputContract: outputContract || undefined,
                   },
                 }
               : undefined,

@@ -6,11 +6,20 @@
 
 import type { FileAttachment } from '../file-storage-types';
 
+export interface LLMFunction {
+  name: string;
+  description: string;
+  parameters: Record<string, unknown>; // JSON Schema
+}
+
 export interface LLMConfig {
   model?: string;
   temperature?: number;
   maxTokens?: number;
   files?: FileAttachment[]; // File attachments for native API support
+  functions?: LLMFunction[]; // Function calling support
+  functionCall?: 'auto' | 'none' | { name: string }; // Function calling mode
+  systemPrompt?: string; // System prompt/instructions
 }
 
 export interface LLMResponse {
@@ -22,6 +31,10 @@ export interface LLMResponse {
   };
   model: string;
   finishReason?: string;
+  functionCall?: {
+    name: string;
+    arguments: string; // JSON string
+  };
 }
 
 export interface LLMError {

@@ -21,6 +21,11 @@ interface Skill {
     version: number;
     content: string;
     changeNotes: string | null;
+    metadata?: {
+      executorConfig?: { toolId?: string };
+      inputContract?: Record<string, unknown> | null;
+      outputContract?: Record<string, unknown> | null;
+    } | null;
   } | null;
   latestVersion: {
     id: string;
@@ -37,6 +42,11 @@ interface Skill {
     createdBy: { name: string | null; email: string };
     approvedBy: { name: string | null; email: string } | null;
     approvedAt: Date | string | null;
+    metadata?: {
+      executorConfig?: { toolId?: string };
+      inputContract?: Record<string, unknown> | null;
+      outputContract?: Record<string, unknown> | null;
+    } | null;
   }>;
 }
 

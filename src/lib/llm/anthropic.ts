@@ -5,7 +5,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { addExecutionLog } from '../runtime/execution-logger';
-import type { LLMConfig, LLMResponse, LLMError, FileAttachment } from './types';
+import type { LLMConfig, LLMResponse, LLMError, FileAttachment, LLMFunction } from './types';
 
 // Re-export types for backward compatibility
 export type { LLMConfig, LLMResponse, LLMError, FileAttachment } from './types';
@@ -66,6 +66,9 @@ export async function callAnthropic(
   const temperature = config.temperature ?? 0.7;
   const maxTokens = config.maxTokens ?? 2000;
   const files = config.files || [];
+  const functions = config.functions || [];
+  const functionCall = config.functionCall || (functions.length > 0 ? 'auto' : undefined);
+  const systemPrompt = config.systemPrompt;
 
   const startTime = Date.now();
 
@@ -220,6 +223,13 @@ export async function callAnthropic(
         
         console.error(`[Anthropic] Error extracting text from file ${fileAttachment.ref}:`, error);
         console.error(`[Anthropic] Error details:`, errorDetails);
+        console.error(`[Anthropic] File metadata:`, {
+          name: metadata.name,
+          mimeType: metadata.mimeType,
+          isImage: metadata.isImage,
+          isText: metadata.isText,
+          ref: fileAttachment.ref,
+        });
         
         // Log error to execution logs for debugging
         if (runId) {
@@ -238,11 +248,9 @@ export async function callAnthropic(
           });
         }
         
-        // Fallback: include file reference with error message
-        messageContentParts.push({
-          type: 'text',
-          text: `\n\n[File attachment: ${metadata.name} (${metadata.mimeType}) - Text extraction failed: ${errorMessage}]`,
-        });
+        // Instead of silently including error in prompt, throw the error so it can be handled properly
+        // This allows the API route to return a proper error response to the user
+        throw new Error(`Failed to extract text from ${metadata.name} (${metadata.mimeType}): ${errorMessage}`);
       }
     }
   }
@@ -334,7 +342,14 @@ export async function callAnthropic(
   }
 
   try {
-    console.error(`[Anthropic] Starting API call for run ${runId}, step ${stepIndex} with ${files.length} file(s), estimated tokens: ${estimatedTokens ?? 'unknown'}`);
+    console.error(`[Anthropic] Starting API call for run ${runId}, step ${stepIndex} with ${files.length} file(s) and ${functions.length} function(s), estimated tokens: ${estimatedTokens ?? 'unknown'}`);
+    
+    // Convert functions to Anthropic tools format
+    const tools = functions.length > 0 ? functions.map(fn => ({
+      name: fn.name,
+      description: fn.description,
+      input_schema: fn.parameters,
+    })) : undefined;
     
     // Prepare request options
     const requestOptions: any = {
@@ -349,6 +364,16 @@ export async function callAnthropic(
         },
       ] as any,
     };
+    
+    // Add system prompt if provided (Anthropic uses top-level system parameter)
+    if (systemPrompt) {
+      requestOptions.system = systemPrompt;
+    }
+    
+    // Add tools if provided
+    if (tools && tools.length > 0) {
+      requestOptions.tools = tools;
+    }
     
     // Add beta header for 1M token context if using Sonnet 4 models
     const MAX_CONTEXT_TOKENS = getMaxContextTokens(model);
@@ -365,7 +390,19 @@ export async function callAnthropic(
     const response = await client.messages.create(requestOptions);
 
     const latency = Date.now() - startTime;
-    const content = response.content[0]?.type === 'text' ? response.content[0].text : '';
+    
+    // Check for tool use (function calling) in response
+    let functionCallResponse: LLMResponse['functionCall'] | undefined;
+    const toolUseBlock = response.content.find((block: any) => block.type === 'tool_use');
+    if (toolUseBlock) {
+      functionCallResponse = {
+        name: toolUseBlock.name,
+        arguments: JSON.stringify(toolUseBlock.input || {}),
+      };
+      console.error(`[Anthropic] Function call detected: ${functionCallResponse.name} for run ${runId}`);
+    }
+    
+    const content = response.content.find((block: any) => block.type === 'text')?.text || '';
     const usage = response.usage
       ? {
           promptTokens: response.usage.input_tokens,
@@ -404,6 +441,7 @@ export async function callAnthropic(
       usage,
       model: response.model,
       finishReason: response.stop_reason || undefined,
+      functionCall: functionCallResponse,
     };
   } catch (error) {
     const latency = Date.now() - startTime;

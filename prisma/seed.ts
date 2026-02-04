@@ -48,6 +48,14 @@ async function main() {
     { name: 'align:read', description: 'View alignment snapshots and artifacts' },
     { name: 'align:write', description: 'Create and update alignment data' },
     { name: 'align:admin', description: 'Manage alignment settings and access' },
+    { name: 'org_chart:read', description: 'View org charts' },
+    { name: 'org_chart:write', description: 'Create and update org charts' },
+    { name: 'org_chart:admin', description: 'Manage org chart access and settings' },
+    { name: 'workspaces:read', description: 'View department workspaces' },
+    { name: 'workspaces:create', description: 'Create department workspaces' },
+    { name: 'workspaces:update', description: 'Update department workspaces' },
+    { name: 'workspaces:delete', description: 'Delete department workspaces' },
+    { name: 'workspaces:admin', description: 'Manage all department workspaces' },
   ];
 
   for (const perm of permissions) {
@@ -105,7 +113,7 @@ async function main() {
   console.log('Assigning permissions to roles...');
 
   const rolePermissions: Record<string, string[]> = {
-    viewer: ['skills:read', 'workflows:read', 'align:read'],
+    viewer: ['skills:read', 'workflows:read', 'align:read', 'org_chart:read', 'workspaces:read'],
     creator: [
       'skills:read',
       'skills:create',
@@ -117,6 +125,11 @@ async function main() {
       'workflows:delete',
       'align:read',
       'align:write',
+      'org_chart:read',
+      'org_chart:write',
+      'workspaces:read',
+      'workspaces:create',
+      'workspaces:update',
     ],
     approver: [
       'skills:read',
@@ -133,6 +146,11 @@ async function main() {
       'workflows:delete',
       'align:read',
       'align:write',
+      'org_chart:read',
+      'org_chart:write',
+      'workspaces:read',
+      'workspaces:create',
+      'workspaces:update',
     ],
     admin: [
       'skills:read',
@@ -140,6 +158,11 @@ async function main() {
       'skills:update',
       'skills:delete',
       'skills:approve',
+      'workspaces:read',
+      'workspaces:create',
+      'workspaces:update',
+      'workspaces:delete',
+      'workspaces:admin',
       'skills:admin',
       'users:read',
       'users:admin',
@@ -152,6 +175,9 @@ async function main() {
       'align:read',
       'align:write',
       'align:admin',
+      'org_chart:read',
+      'org_chart:write',
+      'org_chart:admin',
     ],
   };
 

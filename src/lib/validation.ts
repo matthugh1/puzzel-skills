@@ -50,6 +50,15 @@ export const validationSchemas = {
     tags: z.array(z.string().max(50).trim()).max(20).optional(),
     visibility: z.enum(['TEAM', 'ORG']).optional(),
     toolId: z.string().max(100).trim().optional(),
+    inputContract: z.record(z.string(), z.any()).optional(),
+    outputContract: z.record(z.string(), z.any()).optional(),
+  }),
+
+  composeSkill: z.object({
+    messages: z.array(z.object({
+      role: z.enum(['user', 'assistant']),
+      content: z.string().min(1).max(10000).trim(),
+    })).min(1).max(50),
   }),
 
   updateSkill: z.object({
@@ -58,12 +67,17 @@ export const validationSchemas = {
     category: z.string().max(100).trim().optional(),
     tags: z.array(z.string().max(50).trim()).max(20).optional(),
     toolId: z.string().max(100).trim().optional(),
+    visibility: z.enum(['TEAM', 'ORG']).optional(),
+    inputContract: z.record(z.string(), z.any()).optional().nullable(),
+    outputContract: z.record(z.string(), z.any()).optional().nullable(),
   }),
 
   // Skill versions
   createVersion: z.object({
     content: z.string().min(1, 'Content is required').max(50000).trim(),
     changeNotes: z.string().max(1000).trim().optional(),
+    inputContract: z.record(z.string(), z.any()).optional(),
+    outputContract: z.record(z.string(), z.any()).optional(),
   }),
 
   submitVersion: z.object({
@@ -253,6 +267,84 @@ export const validationSchemas = {
 
   alignUserSearch: z.object({
     search: z.string().min(2).max(200).trim(),
+  }),
+
+  // Org charts
+  createOrgChart: z.object({
+    name: z.string().min(1, 'Name is required').max(100).trim(),
+    visibility: z.enum(['TEAM', 'ORG']).optional(),
+    isDefault: z.boolean().optional(),
+  }),
+
+  updateOrgChart: z.object({
+    name: z.string().min(1).max(100).trim().optional(),
+    visibility: z.enum(['TEAM', 'ORG']).optional(),
+    isDefault: z.boolean().optional(),
+  }),
+
+  createOrgNode: z.object({
+    type: z.enum(['DEPARTMENT', 'TEAM', 'AGENT']),
+    name: z.string().min(1, 'Name is required').max(200).trim(),
+    parentId: z.string().cuid().optional(),
+    agentId: z.string().cuid().optional(),
+    roleTitle: z.string().max(200).trim().optional(),
+    departmentLabel: z.string().max(100).trim().optional(),
+    order: z.number().int().min(0).max(9999).optional(),
+  }),
+
+  updateOrgNode: z.object({
+    name: z.string().min(1).max(200).trim().optional(),
+    parentId: z.string().cuid().nullable().optional(),
+    roleTitle: z.string().max(200).trim().optional(),
+    departmentLabel: z.string().max(100).trim().optional(),
+    order: z.number().int().min(0).max(9999).optional(),
+  }),
+
+  // Department Workspaces
+  createWorkspace: z.object({
+    name: z.string().min(1, 'Name is required').max(200).trim(),
+    description: z.string().max(2000).trim().optional(),
+    slug: z.string().min(1, 'Slug is required').max(100).trim().regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
+  }),
+
+  updateWorkspace: z.object({
+    name: z.string().min(1).max(200).trim().optional(),
+    description: z.string().max(2000).trim().optional(),
+    slug: z.string().min(1).max(100).trim().regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens').optional(),
+    isActive: z.boolean().optional(),
+  }),
+
+  addWorkspaceMember: z.object({
+    userId: z.string().cuid(),
+    role: z.enum(['OWNER', 'ADMIN', 'MEMBER']).optional(),
+  }),
+
+  updateWorkspaceMember: z.object({
+    role: z.enum(['OWNER', 'ADMIN', 'MEMBER']),
+  }),
+
+  // Workspace Chat
+  workspaceChat: z.object({
+    messages: z.array(z.object({
+      role: z.enum(['user', 'assistant']),
+      content: z.string().min(1, 'Message content cannot be empty').max(10000).trim(),
+    })).min(1, 'At least one message is required').max(50),
+    skillId: z.string().min(1).optional(), // Accept any non-empty string for skillId
+    toolId: z.string().max(100).optional(),
+    toolArgs: z.record(z.string(), z.any()).optional(),
+    appId: z.string().max(100).optional(),
+    actionId: z.string().max(100).optional(),
+    actionParams: z.record(z.string(), z.any()).optional(),
+  }),
+
+  // Skill Execution
+  executeSkill: z.object({
+    inputs: z.record(z.string(), z.any()),
+  }),
+
+  // Tool Execution
+  executeTool: z.object({
+    arguments: z.record(z.string(), z.any()),
   }),
 };
 

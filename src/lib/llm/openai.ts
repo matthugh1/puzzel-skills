@@ -5,7 +5,7 @@
 
 import OpenAI from 'openai';
 import { addExecutionLog } from '../runtime/execution-logger';
-import type { LLMConfig, LLMResponse, LLMError, FileAttachment } from './types';
+import type { LLMConfig, LLMResponse, LLMError, FileAttachment, LLMFunction } from './types';
 
 // Re-export types for backward compatibility
 export type { LLMConfig, LLMResponse, LLMError, FileAttachment } from './types';
@@ -40,6 +40,9 @@ export async function callOpenAI(
   const temperature = config.temperature ?? 0.7;
   const maxTokens = config.maxTokens ?? 2000;
   const files = config.files || [];
+  const functions = config.functions || [];
+  const functionCall = config.functionCall || (functions.length > 0 ? 'auto' : undefined);
+  const systemPrompt = config.systemPrompt;
 
   const startTime = Date.now();
 
@@ -193,6 +196,13 @@ export async function callOpenAI(
         
         console.error(`[OpenAI] Error extracting text from file ${fileAttachment.ref}:`, error);
         console.error(`[OpenAI] Error details:`, errorDetails);
+        console.error(`[OpenAI] File metadata:`, {
+          name: metadata.name,
+          mimeType: metadata.mimeType,
+          isImage: metadata.isImage,
+          isText: metadata.isText,
+          ref: fileAttachment.ref,
+        });
         
         // Log error to execution logs for debugging
         if (runId) {
@@ -211,11 +221,9 @@ export async function callOpenAI(
           });
         }
         
-        // Fallback: include file reference with error message
-        messageContentParts.push({
-          type: 'text',
-          text: `\n\n[File attachment: ${metadata.name} (${metadata.mimeType}) - Text extraction failed: ${errorMessage}]`,
-        });
+        // Instead of silently including error in prompt, throw the error so it can be handled properly
+        // This allows the API route to return a proper error response to the user
+        throw new Error(`Failed to extract text from ${metadata.name} (${metadata.mimeType}): ${errorMessage}`);
       }
     }
   }
@@ -246,22 +254,69 @@ export async function callOpenAI(
   }
 
   try {
-    console.error(`[OpenAI] Starting API call for run ${runId}, step ${stepIndex} with ${files.length} file(s)`);
-    const response = await client.chat.completions.create({
+    console.error(`[OpenAI] Starting API call for run ${runId}, step ${stepIndex} with ${files.length} file(s) and ${functions.length} function(s)`);
+    
+    // Convert functions to OpenAI format
+    const tools = functions.length > 0 ? functions.map(fn => ({
+      type: 'function' as const,
+      function: {
+        name: fn.name,
+        description: fn.description,
+        parameters: fn.parameters,
+      },
+    })) : undefined;
+
+    // Build messages array with optional system prompt
+    const messages: Array<{ role: 'system' | 'user'; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }> }> = [];
+    
+    if (systemPrompt) {
+      messages.push({
+        role: 'system',
+        content: systemPrompt,
+      });
+    }
+    
+    messages.push({
+      role: 'user',
+      content: messageContent,
+    });
+
+    const requestParams: Parameters<typeof client.chat.completions.create>[0] = {
       model,
-      messages: [
-        {
-          role: 'user',
-          content: messageContent,
-        },
-      ],
+      messages,
       temperature,
       max_tokens: maxTokens,
-    });
+    };
+
+    // Add function calling support if functions are provided
+    if (tools && tools.length > 0) {
+      requestParams.tools = tools;
+      if (functionCall) {
+        requestParams.tool_choice = functionCall === 'auto' ? 'auto' : functionCall === 'none' ? 'none' : { type: 'function' as const, function: { name: functionCall.name } };
+      }
+    }
+
+    const response = await client.chat.completions.create(requestParams);
 
     console.error(`[OpenAI] API call completed for run ${runId}, step ${stepIndex}`);
     const latency = Date.now() - startTime;
-    const content = response.choices[0]?.message?.content || '';
+    const message = response.choices[0]?.message;
+    const content = message?.content || '';
+    const toolCalls = message?.tool_calls || [];
+    
+    // Check if LLM wants to call a function
+    let functionCallResponse: LLMResponse['functionCall'] | undefined;
+    if (toolCalls.length > 0) {
+      const firstToolCall = toolCalls[0];
+      if (firstToolCall.type === 'function') {
+        functionCallResponse = {
+          name: firstToolCall.function.name,
+          arguments: firstToolCall.function.arguments,
+        };
+        console.error(`[OpenAI] Function call detected: ${functionCallResponse.name} for run ${runId}`);
+      }
+    }
+    
     console.error(`[OpenAI] Response content length: ${content.length} for run ${runId}`);
     const usage = response.usage
       ? {
@@ -301,6 +356,7 @@ export async function callOpenAI(
       usage,
       model: response.model,
       finishReason: response.choices[0]?.finish_reason || undefined,
+      functionCall: functionCallResponse,
     };
   } catch (error) {
     const latency = Date.now() - startTime;

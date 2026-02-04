@@ -90,7 +90,7 @@ export function createAppActionNode(step: WorkflowStep) {
       const credentials = JSON.parse(decrypted);
 
       // Create adapter and connect
-      const adapter = createIntegrationAdapter(appId as 'gmail' | 'slack');
+      const adapter = createIntegrationAdapter(appId as 'gmail' | 'slack' | 'office365');
       await adapter.connect(credentials);
 
       // Execute action

@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { checkAuthWithPermission, PERMISSIONS } from '@/lib/permissions';
 import { audit } from '@/lib/audit';
+import { validateCSRFToken } from '@/lib/csrf';
+import { rateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { validateRequestBody, validationSchemas, ValidationError } from '@/lib/validation';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -53,7 +56,12 @@ export async function GET(request: Request, context: RouteContext) {
  * POST /api/skills/:id/versions
  * Create a new version of a skill
  */
-export async function POST(request: Request, context: RouteContext) {
+export async function POST(request: NextRequest, context: RouteContext) {
+  const csrfError = validateCSRFToken(request);
+  if (csrfError) {
+    return csrfError;
+  }
+
   const authResult = await checkAuthWithPermission(request, PERMISSIONS.SKILLS_UPDATE);
 
   if (!authResult.authorized) {
@@ -61,6 +69,12 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   const { user } = authResult;
+
+  const rateLimitResponse = rateLimit(request, RATE_LIMITS.API, user.id);
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   const { id } = await context.params;
 
   const skill = await db.skill.findUnique({
@@ -69,6 +83,7 @@ export async function POST(request: Request, context: RouteContext) {
       versions: {
         orderBy: { version: 'desc' },
         take: 1,
+        include: { metadata: true },
       },
     },
   });
@@ -92,19 +107,31 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   try {
-    const body = await request.json();
-    const { content, changeNotes } = body;
-
-    if (!content) {
-      return NextResponse.json(
-        { error: 'Content is required' },
-        { status: 400 }
-      );
-    }
+    const body = await validateRequestBody(request, validationSchemas.createVersion);
+    const { content, changeNotes, inputContract, outputContract } = body;
 
     // Calculate next version number
     const latestVersion = skill.versions[0];
     const nextVersionNumber = latestVersion ? latestVersion.version + 1 : 1;
+
+    const metadataFromLatest = latestVersion?.metadata
+      ? {
+        inputContract: latestVersion.metadata.inputContract ?? undefined,
+        outputContract: latestVersion.metadata.outputContract ?? undefined,
+        capabilities: latestVersion.metadata.capabilities,
+        preferredInputs: latestVersion.metadata.preferredInputs ?? undefined,
+        maxRetries: latestVersion.metadata.maxRetries ?? undefined,
+        timeoutSeconds: latestVersion.metadata.timeoutSeconds ?? undefined,
+        requiresApproval: latestVersion.metadata.requiresApproval,
+        executorConfig: latestVersion.metadata.executorConfig ?? undefined,
+      }
+      : null;
+
+    const hasMetadata = Boolean(
+      metadataFromLatest ||
+      inputContract ||
+      outputContract
+    );
 
     const version = await db.skillVersion.create({
       data: {
@@ -114,6 +141,16 @@ export async function POST(request: Request, context: RouteContext) {
         status: 'DRAFT',
         skillId: id,
         createdById: user.id,
+        metadata: hasMetadata
+          ? {
+              create: {
+                ...(metadataFromLatest || {}),
+                capabilities: metadataFromLatest?.capabilities ?? [],
+                inputContract: inputContract || metadataFromLatest?.inputContract,
+                outputContract: outputContract || metadataFromLatest?.outputContract,
+              },
+            }
+          : undefined,
       },
       include: {
         createdBy: {
@@ -130,6 +167,13 @@ export async function POST(request: Request, context: RouteContext) {
 
     return NextResponse.json({ version }, { status: 201 });
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return NextResponse.json(
+        { error: 'Invalid request data', details: error.errors },
+        { status: 400 }
+      );
+    }
+
     console.error('Create version error:', error);
     return NextResponse.json(
       { error: 'Failed to create version' },

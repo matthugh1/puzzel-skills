@@ -9,16 +9,19 @@ export async function POST(request: Request) {
   // Rate limiting - strict limits for authentication
   const rateLimitResponse = rateLimit(request, RATE_LIMITS.AUTH);
   if (rateLimitResponse) {
+    console.log('Login blocked by rate limit');
     return rateLimitResponse;
   }
 
   try {
     // Validate input
     const { email, password } = await validateRequestBody(request, validationSchemas.login);
+    console.log(`Login attempt for: ${email}`);
 
     // Check if account is locked due to failed attempts
     const lockStatus = trackFailedLogin(email);
     if (lockStatus.locked) {
+      console.log(`Login blocked - account locked for: ${email}`);
       return NextResponse.json(
         { error: 'Account temporarily locked due to too many failed attempts. Please try again later.' },
         { status: 429 }
@@ -26,14 +29,24 @@ export async function POST(request: Request) {
     }
 
     const result = await auth.authenticate({ email, password });
+    console.log(`Authentication result for ${email}:`, { success: result.success, error: result.error });
 
     if (!result.success) {
       // Track failed attempt
       trackFailedLogin(email);
       // Log failed login attempt
-      await audit.authFailed(email, { error: result.error }, request);
+      await audit.authFailed(email, { error: result.error }, request).catch((err) => {
+        console.error('Failed to log audit:', err);
+      });
+      
+      // Return more specific error message for debugging (in dev) but generic in production
+      const errorMessage = process.env.NODE_ENV === 'development' && result.error 
+        ? result.error 
+        : 'Invalid credentials';
+      
+      console.log(`Login failed for ${email}: ${errorMessage}`);
       return NextResponse.json(
-        { error: 'Invalid credentials' }, // Generic error message
+        { error: errorMessage },
         { status: 401 }
       );
     }

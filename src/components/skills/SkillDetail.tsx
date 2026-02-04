@@ -25,17 +25,36 @@ interface SkillDetailProps {
     createdBy: { name: string | null; email: string };
     approvedBy: { name: string | null; email: string } | null;
     approvedAt: Date | string | null;
+    metadata?: {
+      executorConfig?: { toolId?: string };
+      inputContract?: Record<string, unknown> | null;
+      outputContract?: Record<string, unknown> | null;
+    } | null;
   }>;
   latestPublished: {
     id: string;
     version: number;
     content: string;
     changeNotes: string | null;
+    metadata?: {
+      executorConfig?: { toolId?: string };
+      inputContract?: Record<string, unknown> | null;
+      outputContract?: Record<string, unknown> | null;
+    } | null;
   } | null;
 }
 
 export function SkillDetail({ skill, versions, latestPublished }: SkillDetailProps) {
   const [copied, setCopied] = useState(false);
+  const latestContractMetadata =
+    latestPublished?.metadata ||
+    versions.find((version) => version.id === latestPublished?.id)?.metadata ||
+    versions[0]?.metadata ||
+    null;
+
+  const toolId = latestContractMetadata?.executorConfig?.toolId;
+  const inputContract = latestContractMetadata?.inputContract || null;
+  const outputContract = latestContractMetadata?.outputContract || null;
 
   const handleCopyPrompt = async () => {
     if (!latestPublished) return;
@@ -241,6 +260,123 @@ export function SkillDetail({ skill, versions, latestPublished }: SkillDetailPro
               <strong>Change Notes:</strong> {latestPublished.changeNotes}
             </div>
           )}
+        </div>
+      )}
+
+      {(toolId || inputContract || outputContract) && (
+        <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+          <h2
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: 600,
+              fontFamily: 'var(--font-display)',
+              color: 'var(--color-text)',
+              marginBottom: 'var(--spacing-md)',
+            }}
+          >
+            Skill Contract
+          </h2>
+          <div
+            style={{
+              border: '1px solid var(--color-border-muted)',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--color-surface)',
+              padding: 'var(--spacing-lg)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--spacing-md)',
+            }}
+          >
+            {toolId && (
+              <div>
+                <div
+                  style={{
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color: 'var(--color-text-muted)',
+                    marginBottom: 'var(--spacing-xs)',
+                  }}
+                >
+                  Tool Binding
+                </div>
+                <code
+                  style={{
+                    display: 'inline-block',
+                    padding: 'var(--spacing-xs) var(--spacing-sm)',
+                    background: 'var(--color-surface-secondary)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--color-text)',
+                  }}
+                >
+                  {toolId}
+                </code>
+              </div>
+            )}
+
+            {inputContract && (
+              <div>
+                <div
+                  style={{
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color: 'var(--color-text-muted)',
+                    marginBottom: 'var(--spacing-xs)',
+                  }}
+                >
+                  Input Contract
+                </div>
+                <pre
+                  style={{
+                    margin: 0,
+                    padding: 'var(--spacing-md)',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--color-surface-secondary)',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.8125rem',
+                    color: 'var(--color-text)',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  {JSON.stringify(inputContract, null, 2)}
+                </pre>
+              </div>
+            )}
+
+            {outputContract && (
+              <div>
+                <div
+                  style={{
+                    fontSize: '0.75rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color: 'var(--color-text-muted)',
+                    marginBottom: 'var(--spacing-xs)',
+                  }}
+                >
+                  Output Contract
+                </div>
+                <pre
+                  style={{
+                    margin: 0,
+                    padding: 'var(--spacing-md)',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--color-surface-secondary)',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.8125rem',
+                    color: 'var(--color-text)',
+                    whiteSpace: 'pre-wrap',
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  {JSON.stringify(outputContract, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

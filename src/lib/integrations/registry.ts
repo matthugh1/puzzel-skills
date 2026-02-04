@@ -5,9 +5,10 @@
 
 import { GmailAdapter } from './gmail';
 import { SlackAdapter } from './slack';
+import { Office365Adapter } from './office365';
 import { BaseIntegrationAdapter } from './base';
 
-export type IntegrationName = 'gmail' | 'slack';
+export type IntegrationName = 'gmail' | 'slack' | 'office365';
 
 /**
  * Create integration adapter instance
@@ -18,6 +19,8 @@ export function createIntegrationAdapter(appName: IntegrationName): BaseIntegrat
       return new GmailAdapter();
     case 'slack':
       return new SlackAdapter();
+    case 'office365':
+      return new Office365Adapter();
     default:
       throw new Error(`Unknown integration: ${appName}`);
   }
@@ -42,6 +45,11 @@ export function getAvailableIntegrations(): Array<{
       name: 'slack',
       displayName: 'Slack',
       description: 'Send messages and manage channels in Slack',
+    },
+    {
+      name: 'office365',
+      displayName: 'Office 365',
+      description: 'Send emails, manage calendar, and access Microsoft Graph via Office 365',
     },
   ];
 }

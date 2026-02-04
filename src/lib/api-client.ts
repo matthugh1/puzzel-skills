@@ -162,6 +162,8 @@ export const skillsApi = {
     content: string;
     visibility?: 'TEAM' | 'ORG';
     toolId?: string;
+    inputContract?: Record<string, unknown>;
+    outputContract?: Record<string, unknown>;
   }) => {
     return apiRequest<{ skill: unknown }>('/api/skills', {
       method: 'POST',
@@ -176,6 +178,8 @@ export const skillsApi = {
     tags?: string[];
     visibility?: 'TEAM' | 'ORG';
     toolId?: string | null; // null means explicitly remove tool, undefined means don't change
+    inputContract?: Record<string, unknown> | null;
+    outputContract?: Record<string, unknown> | null;
   }) => {
     // Always include toolId if it's in the data (even if null) so API knows to update it
     const body: Record<string, unknown> = { ...data };
@@ -199,6 +203,8 @@ export const skillsApi = {
   createVersion: (id: string, data: {
     content: string;
     changeNotes?: string;
+    inputContract?: Record<string, unknown>;
+    outputContract?: Record<string, unknown>;
   }) => {
     return apiRequest<{ version: unknown }>(`/api/skills/${id}/versions`, {
       method: 'POST',
@@ -224,6 +230,28 @@ export const skillsApi = {
     return apiRequest<{ version: unknown }>(`/api/skills/${id}/reject`, {
       method: 'POST',
       body: JSON.stringify({ versionId, reason }),
+    });
+  },
+
+  compose: (messages: Array<{ role: 'user' | 'assistant'; content: string }>) => {
+    return apiRequest<{
+      response: {
+        type: 'question' | 'proposal';
+        question?: string;
+        skill?: {
+          name: string;
+          description?: string;
+          content: string;
+          category?: string;
+          tags?: string[];
+          inputContract?: Record<string, unknown>;
+          outputContract?: Record<string, unknown>;
+        };
+      };
+      model: string;
+    }>('/api/skills/compose', {
+      method: 'POST',
+      body: JSON.stringify({ messages }),
     });
   },
 };
@@ -636,6 +664,80 @@ export const usersApi = {
 };
 
 /**
+ * API methods for agents
+ */
+export const agentsApi = {
+  list: () => {
+    return apiRequest<{ agents: unknown[] }>('/api/agents');
+  },
+};
+
+/**
+ * API methods for org charts
+ */
+export const orgChartsApi = {
+  list: () => {
+    return apiRequest<{ charts: unknown[] }>('/api/org-charts');
+  },
+
+  create: (data: { name: string; visibility?: 'TEAM' | 'ORG'; isDefault?: boolean }) => {
+    return apiRequest<{ chart: unknown }>('/api/org-charts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  update: (id: string, data: { name?: string; visibility?: 'TEAM' | 'ORG'; isDefault?: boolean }) => {
+    return apiRequest<{ chart: unknown }>(`/api/org-charts/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  getById: (id: string) => {
+    return apiRequest<{ chart: unknown }>(`/api/org-charts/${id}`);
+  },
+
+  getNodes: (id: string) => {
+    return apiRequest<{ nodes: unknown[] }>(`/api/org-charts/${id}/nodes`);
+  },
+
+  createNode: (id: string, data: {
+    type: 'DEPARTMENT' | 'TEAM' | 'AGENT';
+    name: string;
+    parentId?: string;
+    agentId?: string;
+    roleTitle?: string;
+    departmentLabel?: string;
+    order?: number;
+  }) => {
+    return apiRequest<{ node: unknown }>(`/api/org-charts/${id}/nodes`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateNode: (id: string, nodeId: string, data: {
+    name?: string;
+    parentId?: string | null;
+    roleTitle?: string;
+    departmentLabel?: string;
+    order?: number;
+  }) => {
+    return apiRequest<{ node: unknown }>(`/api/org-charts/${id}/nodes/${nodeId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteNode: (id: string, nodeId: string) => {
+    return apiRequest<{ success: boolean }>(`/api/org-charts/${id}/nodes/${nodeId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+/**
  * API methods for tasks
  */
 export const tasksApi = {
@@ -665,6 +767,247 @@ export const dataInputsApi = {
     return apiRequest<{ success: boolean }>(`/api/data-inputs/${id}/submit`, {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  },
+};
+
+/**
+ * API methods for workspaces
+ */
+export const workspacesApi = {
+  list: () => {
+    return apiRequest<{ workspaces: unknown[] }>('/api/workspaces');
+  },
+
+  getById: (id: string) => {
+    return apiRequest<{ workspace: unknown }>(`/api/workspaces/${id}`);
+  },
+
+  create: (data: { name: string; description?: string; slug: string }) => {
+    return apiRequest<{ workspace: unknown }>('/api/workspaces', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  update: (id: string, data: { name?: string; description?: string; slug?: string; isActive?: boolean }) => {
+    return apiRequest<{ workspace: unknown }>(`/api/workspaces/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  delete: (id: string) => {
+    return apiRequest<{ workspace: unknown }>(`/api/workspaces/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getMembers: (id: string) => {
+    return apiRequest<{ members: unknown[] }>(`/api/workspaces/${id}/members`);
+  },
+
+  addMember: (id: string, data: { userId: string; role?: 'OWNER' | 'ADMIN' | 'MEMBER' }) => {
+    return apiRequest<{ member: unknown }>(`/api/workspaces/${id}/members`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateMember: (id: string, userId: string, data: { role: 'OWNER' | 'ADMIN' | 'MEMBER' }) => {
+    return apiRequest<{ member: unknown }>(`/api/workspaces/${id}/members/${userId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  removeMember: (id: string, userId: string) => {
+    return apiRequest<{ success: boolean }>(`/api/workspaces/${id}/members/${userId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  chat: (id: string, messages: Array<{ role: 'user' | 'assistant'; content: string }>, options?: {
+    skillId?: string;
+    toolId?: string;
+    toolArgs?: Record<string, unknown>;
+    appId?: string;
+    actionId?: string;
+    actionParams?: Record<string, unknown>;
+    files?: Map<string, File>;
+  }) => {
+    // If files are present, use FormData
+    if (options?.files && options.files.size > 0) {
+      // Ensure CSRF token is available
+      let csrfToken = getCSRFToken();
+      if (!csrfToken) {
+        return ensureCSRFToken().then((token) => {
+          if (!token) {
+            throw new Error('CSRF token missing. Please refresh the page and try again.');
+          }
+          return sendChatWithFiles(id, messages, options, token);
+        });
+      }
+      return sendChatWithFiles(id, messages, options, csrfToken);
+    }
+    
+    // Otherwise use JSON
+    return apiRequest<{ response: { type: 'message' | 'skill_result' | 'tool_result' | 'app_action_result'; content: string; skillId?: string; toolId?: string; appId?: string; actionId?: string; result?: unknown; canEscalate?: boolean; selectedTools?: Array<{ id: string; name: string; description: string }> } }>(`/api/workspaces/${id}/chat`, {
+      method: 'POST',
+      body: JSON.stringify({
+        messages,
+        skillId: options?.skillId,
+        toolId: options?.toolId,
+        toolArgs: options?.toolArgs,
+        appId: options?.appId,
+        actionId: options?.actionId,
+        actionParams: options?.actionParams,
+      }),
+    });
+  },
+
+  getSkills: (id: string) => {
+    return apiRequest<{ skills: unknown[] }>(`/api/workspaces/${id}/skills`);
+  },
+
+  executeSkill: (id: string, skillId: string, inputs: Record<string, unknown>) => {
+    return apiRequest<{ result: string; success: boolean }>(`/api/workspaces/${id}/skills/${skillId}/execute`, {
+      method: 'POST',
+      body: JSON.stringify({ inputs }),
+    });
+  },
+
+  getIntegrations: (id: string) => {
+    return apiRequest<{ integrations: unknown[] }>(`/api/workspaces/${id}/integrations`);
+  },
+};
+
+/**
+ * Helper function to send chat request with files using FormData
+ */
+async function sendChatWithFiles(
+  id: string,
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>,
+  options: { skillId?: string; toolId?: string; toolArgs?: Record<string, unknown>; files?: Map<string, File> },
+  csrfToken: string
+): Promise<{ response: { type: 'message' | 'skill_result' | 'tool_result'; content: string; skillId?: string; toolId?: string; result?: unknown; canEscalate?: boolean; selectedTools?: Array<{ id: string; name: string; description: string }> } }> {
+  const formData = new FormData();
+  
+  // Add JSON data
+  const { files, ...jsonData } = options;
+  formData.append('data', JSON.stringify({
+    messages,
+    ...jsonData,
+  }));
+  
+  // Add files
+  if (files) {
+    for (const [fieldName, file] of files.entries()) {
+      formData.append(fieldName, file);
+    }
+  }
+  
+  // Use FormData for file uploads
+  // Note: Don't set Content-Type header - browser will set it with boundary
+  const response = await fetch(`${API_BASE_URL}/api/workspaces/${id}/chat`, {
+    method: 'POST',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+    },
+    credentials: 'include',
+    body: formData,
+  });
+  
+  if (!response.ok) {
+    let errorMessage = `Request failed: ${response.status}`;
+    let errorDetails: unknown = null;
+    let errorStack: string | undefined = undefined;
+    let errorName: string | undefined = undefined;
+    
+    try {
+      const error = await response.json();
+      errorMessage = error.error || error.message || errorMessage;
+      
+      // Handle details - make sure it's a string
+      if (error.details !== undefined) {
+        if (typeof error.details === 'string') {
+          errorDetails = error.details;
+          errorMessage = `${errorMessage}: ${error.details}`;
+        } else if (typeof error.details === 'object' && error.details !== null) {
+          // If details is an object, stringify it properly
+          try {
+            const detailsStr = JSON.stringify(error.details, null, 2);
+            errorDetails = detailsStr;
+            errorMessage = `${errorMessage}\n\nDetails:\n${detailsStr}`;
+          } catch (stringifyError) {
+            errorDetails = String(error.details);
+            errorMessage = `${errorMessage}: ${String(error.details)}`;
+          }
+        } else {
+          errorDetails = String(error.details);
+          errorMessage = `${errorMessage}: ${String(error.details)}`;
+        }
+      } else if (error.stack) {
+        errorDetails = error.stack;
+        errorMessage = `${errorMessage}\n\nStack trace:\n${error.stack}`;
+      }
+      
+      errorStack = error.stack;
+      errorName = error.name || 'Error';
+    } catch (e) {
+      // If response is not JSON, try to get text
+      try {
+        const text = await response.text();
+        if (text) {
+          errorMessage = text;
+        }
+      } catch (textError) {
+        // Ignore text parsing errors
+      }
+    }
+    
+    const fullError = new Error(errorMessage);
+    
+    // Store details as a string to avoid [object Object] issues
+    if (errorDetails) {
+      const detailsStr = typeof errorDetails === 'string' 
+        ? errorDetails 
+        : JSON.stringify(errorDetails, null, 2);
+      (fullError as unknown as { details: string }).details = detailsStr;
+    }
+    if (errorStack) {
+      (fullError as unknown as { stack: string }).stack = errorStack;
+    }
+    if (errorName) {
+      (fullError as unknown as { name: string }).name = errorName;
+    }
+    
+    console.error('[API Client] Request failed:', {
+      status: response.status,
+      statusText: response.statusText,
+      errorMessage,
+      errorDetails: typeof errorDetails === 'string' ? errorDetails : JSON.stringify(errorDetails),
+      errorStack,
+    });
+    
+    throw fullError;
+  }
+  
+  return response.json();
+}
+
+/**
+ * API methods for tools
+ */
+export const toolsApi = {
+  list: () => {
+    return apiRequest<{ tools: unknown[] }>('/api/tools');
+  },
+
+  execute: (toolId: string, args: Record<string, unknown>) => {
+    return apiRequest<{ result: unknown }>(`/api/tools/${toolId}/execute`, {
+      method: 'POST',
+      body: JSON.stringify({ arguments: args }),
     });
   },
 };

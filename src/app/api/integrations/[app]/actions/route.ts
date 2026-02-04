@@ -30,7 +30,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
   try {
     // Create adapter and get actions
-    const adapter = createIntegrationAdapter(app as 'gmail' | 'slack');
+    const adapter = createIntegrationAdapter(app as 'gmail' | 'slack' | 'office365');
     const actions = await adapter.getActions();
 
     return NextResponse.json({ actions });

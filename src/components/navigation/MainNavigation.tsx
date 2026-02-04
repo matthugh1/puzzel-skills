@@ -57,9 +57,21 @@ const userNavItems: NavItem[] = [
   },
   { href: '/workflows', label: 'Workflows', requiresAuth: true },
   { href: '/agents', label: 'Agents', requiresAuth: true },
+  {
+    href: '/org-chart',
+    label: 'Org Chart',
+    requiresAuth: true,
+    requiresPermission: 'org_chart:read',
+  },
+  {
+    href: '/workspaces',
+    label: 'Workspaces',
+    requiresAuth: true,
+    requiresPermission: 'workspaces:read',
+  },
   { href: '/integrations', label: 'Integrations', requiresAuth: true },
   { href: '/inbox', label: 'Inbox', requiresAuth: true },
-  { href: '/runs', label: 'My Agents', requiresAuth: true },
+  { href: '/runs', label: 'Runs', requiresAuth: true },
   {
     href: '/approvals',
     label: 'Skill Approvals',
@@ -86,8 +98,14 @@ export function MainNavigation() {
   useEffect(() => {
     // Fetch user info - cookie will be sent automatically
     // No need to check localStorage since we use httpOnly cookies
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const headers: HeadersInit = token
+      ? { Authorization: `Bearer ${token}` }
+      : {};
+
     fetch('/api/auth/me', {
       credentials: 'include', // Ensure cookies are sent
+      headers,
     })
       .then((res) => {
         if (res.ok) {
@@ -275,14 +293,22 @@ export function MainNavigation() {
             <button
               onClick={async () => {
                 try {
+                  // Clear localStorage token
+                  localStorage.removeItem('auth_token');
+                  
+                  // Call logout API to clear cookie and revoke token
                   await fetch('/api/auth/logout', {
                     method: 'POST',
                     credentials: 'include', // Ensure cookies are sent
                   });
-                  window.location.href = '/skills';
+                  
+                  // Redirect to login page
+                  window.location.href = '/login';
                 } catch (err) {
                   console.error('Logout error:', err);
-                  window.location.href = '/skills';
+                  // Even if API call fails, clear localStorage and redirect
+                  localStorage.removeItem('auth_token');
+                  window.location.href = '/login';
                 }
               }}
               style={{

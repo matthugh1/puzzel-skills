@@ -97,24 +97,42 @@ async function getUserWithPermissions(userId: string): Promise<AuthUser | null> 
 export class SimpleAuthProvider implements AuthProvider {
   async authenticate(credentials: LoginCredentials): Promise<AuthResult> {
     try {
+      console.log(`[Auth] Authenticating user: ${credentials.email}`);
       const user = await db.user.findUnique({
         where: { email: credentials.email },
       });
 
       if (!user || !user.passwordHash) {
+        console.log(`[Auth] User not found or no password hash: ${credentials.email}`);
         // Generic error message to prevent user enumeration
         return { success: false, error: 'Invalid credentials' };
       }
 
+      console.log(`[Auth] User found, verifying password for: ${user.email}`);
       const passwordValid = await verifyPassword(credentials.password, user.passwordHash);
       if (!passwordValid) {
+        console.log(`[Auth] Password verification failed for: ${user.email}`);
         return { success: false, error: 'Invalid credentials' };
       }
 
+      console.log(`[Auth] Password valid, loading permissions for: ${user.email}`);
       const authUser = await getUserWithPermissions(user.id);
       if (!authUser) {
+        console.error(`[Auth] Failed to load permissions for user ${user.id} (${user.email})`);
+        // Check if user has roles
+        const userWithRoles = await db.user.findUnique({
+          where: { id: user.id },
+          include: { roles: true },
+        });
+        if (!userWithRoles || userWithRoles.roles.length === 0) {
+          console.error(`[Auth] User ${user.email} has no roles assigned`);
+          return { success: false, error: 'User has no roles assigned. Please contact an administrator.' };
+        }
+        console.error(`[Auth] User ${user.email} has ${userWithRoles.roles.length} roles but getUserWithPermissions returned null`);
         return { success: false, error: 'Failed to load user permissions' };
       }
+
+      console.log(`[Auth] Successfully authenticated: ${user.email} with roles: ${authUser.roles.join(', ')}`);
 
       const token = await createToken(authUser);
 
